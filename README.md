@@ -9,6 +9,8 @@ The leaderboard is now saved online, on Netlify, instead of in one browser. Ever
 | `public/` | The game itself (`index.html` + icon). This is all that visitors download. |
 | `netlify/functions/leaderboard.mjs` | A small server function at `/api/leaderboard` that stores the scores (Netlify Blobs). |
 | `netlify/lib/board.mjs` | The rules: recording games, deleting scores, checking the code. |
+| `public/upload.html` | The phone page players reach by scanning the QR code, to send a selfie to the screen. |
+| `netlify/functions/selfie.mjs`, `netlify/lib/selfie.mjs` | Passes the selfie from the phone to the screen (`/api/selfie`). Each photo is deleted as soon as the screen picks it up, and anything left over is removed after 10 minutes. |
 | `netlify.toml`, `package.json` | Tell Netlify where things are and what to install. |
 
 ## Deploying
@@ -45,3 +47,7 @@ The old version kept scores only in the kiosk's browser. Before you update:
 Each asks for the confirmation code (**1984**). The code is checked on the server and never appears in the page, so visitors can't read it. After 5 wrong codes in 10 minutes, deleting pauses for 10 minutes.
 
 To change the code without touching the files: Netlify → Site configuration → Environment variables → add `LEADERBOARD_CODE` with the new code, then redeploy.
+
+## Selfies by QR code
+
+When a player chooses **Make me from a photo**, the screen shows a QR code. Scanning it opens `upload.html` on their phone, where they take a selfie and tap **Send to screen**. The screen checks every 1.5 seconds, turns the photo into their pixel character and deletes it from Netlify straight away. The screen's own camera is still available through the small link under the QR code. The QR option only works on the Netlify site, not when `index.html` is opened from a computer.

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pixel Me Selfie</title>
+<meta name="theme-color" content="#000000">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root{--p0:#ff3cf0;--p1:#29e3ff;--gold:#ffe600;--ink:#fff;--dim:#86a9b4;--bg:#000;--panel:#05070a;--lime:#b6ff3b;--pink:#ff3d9a}
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Press Start 2P",ui-monospace,Menlo,monospace}
+  main{min-height:100vh;display:flex;flex-direction:column;align-items:center;gap:22px;padding:28px 16px 40px;text-align:center}
+  h1{margin:0;font-weight:normal;font-size:22px;line-height:1.5;color:#fff;text-shadow:0 3px 0 var(--p0),0 6px 0 #4a0a4a}
+  h1 span{color:var(--gold)}
+  p{margin:0;color:var(--dim);font-size:11px;line-height:1.9;max-width:34ch}
+  .frame{width:min(78vw,340px);aspect-ratio:1;border:4px solid var(--p1);box-shadow:0 0 18px rgba(41,227,255,.5);background:#061015;display:grid;place-items:center;overflow:hidden}
+  .frame canvas{width:100%;height:100%;display:block}
+  .frame .ph{color:var(--dim);font-size:10px;line-height:2;padding:16px}
+  .btn{display:block;width:min(78vw,340px);font-family:inherit;font-size:14px;padding:18px 12px;border:0;background:var(--gold);color:#000;box-shadow:0 5px 0 #9c8400;cursor:pointer;text-align:center}
+  .btn:active{transform:translateY(4px);box-shadow:0 1px 0 #9c8400}
+  .btn.alt{background:#061015;color:var(--p1);box-shadow:none;outline:3px solid var(--p1)}
+  .btn[disabled]{opacity:.4}
+  #file{position:absolute;width:1px;height:1px;opacity:0}
+  .msg{font-size:11px;line-height:1.9;min-height:1.9em;color:var(--lime);max-width:34ch}
+  .msg.err{color:var(--pink)}
+  .lang{position:fixed;top:10px;right:10px;font-size:10px;color:var(--dim);display:flex;gap:6px}
+  .lang b{font-weight:normal;padding:6px 8px;border:2px solid #3a4448;cursor:pointer}
+  .lang b.on{background:var(--gold);color:#000;border-color:var(--gold)}
+  .done{font-size:44px}
+</style>
+</head>
+<body>
+<div class="lang"><b data-l="en">EN</b><b data-l="nl">NL</b></div>
+<main>
+  <h1>PIXEL <span>ME</span><br>SELFIE</h1>
+  <p id="intro"></p>
+  <div class="frame" id="frame"><div class="ph" id="ph"></div></div>
+  <label class="btn" for="file" id="takeBtn"></label>
+  <input type="file" id="file" accept="image/*" capture="user">
+  <button class="btn" id="sendBtn" hidden></button>
+  <div class="msg" id="msg" aria-live="polite"></div>
+  <p id="privacy"></p>
+</main>
+<script>
+(function(){'use strict';
+var TXT={
+ en:{intro:'Take a selfie and it will appear on the big screen as your pixel hero.',ph:'Face the camera, fill the frame, plain background if you can',take:'📸 TAKE SELFIE',retake:'📸 RETAKE',send:'SEND TO SCREEN ▶',sending:'Sending…',sent:'Sent! Look at the big screen 👀',again:'Not happy with it? Tap RETAKE on the big screen and scan the new code.',bad:'This link is missing its code. Scan the QR code on the screen again.',fail:'Could not send. Check your internet and try again.',privacy:'Your photo goes only to the game screen and is deleted as soon as it arrives.'},
+ nl:{intro:'Maak een selfie en die verschijnt op het grote scherm als jouw pixelheld.',ph:'Kijk in de camera, vul het kader, liefst met een rustige achtergrond',take:'📸 MAAK SELFIE',retake:'📸 OPNIEUW',send:'STUUR NAAR SCHERM ▶',sending:'Versturen…',sent:'Verstuurd! Kijk naar het grote scherm 👀',again:'Niet tevreden? Tik op OPNIEUW op het grote scherm en scan de nieuwe code.',bad:'Deze link mist de code. Scan de QR-code op het scherm opnieuw.',fail:'Versturen mislukt. Controleer je internet en probeer het opnieuw.',privacy:'Je foto gaat alleen naar het spelscherm en wordt verwijderd zodra hij aankomt.'}};
+var q=new URLSearchParams(location.search),S=q.get('s')||'',L=q.get('l')==='nl'?'nl':'en',shot=null;
+function $(id){return document.getElementById(id)}
+function t(k){return TXT[L][k]}
+function paint(){document.documentElement.lang=L==='nl'?'nl':'en-GB';$('intro').textContent=t('intro');$('ph').textContent=t('ph');$('takeBtn').textContent=shot?t('retake'):t('take');
+  $('sendBtn').textContent=t('send');$('privacy').textContent=t('privacy');document.querySelectorAll('.lang b').forEach(function(b){b.classList.toggle('on',b.dataset.l===L)});}
+document.querySelectorAll('.lang b').forEach(function(b){b.onclick=function(){L=b.dataset.l;paint();}});
+paint();
+if(!/^[a-z0-9]{8,24}$/.test(S)){$('msg').textContent=t('bad');$('msg').className='msg err';$('takeBtn').hidden=true;}
+$('file').addEventListener('change',function(e){var f=e.target.files&&e.target.files[0];if(!f)return;var url=URL.createObjectURL(f),img=new Image();
+  img.onload=function(){var s=Math.min(img.naturalWidth,img.naturalHeight),sx=(img.naturalWidth-s)/2,sy=img.naturalHeight>img.naturalWidth?(img.naturalHeight-s)*0.3:(img.naturalHeight-s)/2;
+    var c=document.createElement('canvas');c.width=c.height=640;c.getContext('2d').drawImage(img,sx,sy,s,s,0,0,640,640);URL.revokeObjectURL(url);
+    shot=c.toDataURL('image/jpeg',0.88);var fr=$('frame');fr.innerHTML='';c.style.width='100%';c.style.height='100%';fr.appendChild(c);
+    $('sendBtn').hidden=false;$('sendBtn').disabled=false;$('msg').textContent='';$('msg').className='msg';paint();};
+  img.onerror=function(){$('msg').textContent=t('fail');$('msg').className='msg err';};img.src=url;e.target.value='';});
+$('sendBtn').addEventListener('click',function(){if(!shot)return;var b=$('sendBtn');b.disabled=true;b.textContent=t('sending');
+  fetch('/api/selfie',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({s:S,img:shot})})
+    .then(function(r){if(!r.ok)throw 0;$('msg').innerHTML='';var d=document.createElement('div');d.className='done';d.textContent='✓';$('msg').appendChild(d);
+      $('msg').appendChild(document.createTextNode(t('sent')));$('msg').className='msg';b.hidden=true;$('privacy').textContent=t('again');})
+    .catch(function(){b.disabled=false;b.textContent=t('send');$('msg').textContent=t('fail');$('msg').className='msg err';});});
+})();
+</script>
+</body>
+</html>
