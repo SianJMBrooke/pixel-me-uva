@@ -343,7 +343,7 @@ var CARTOON=(function(){
     var res=seg.segment(c),cm=res.categoryMask;if(!cm)return null;var cat=cm.getAsUint8Array(),mw=cm.width,mh=cm.height;
     var cls=new Uint8Array(N*N),x,y;for(y=0;y<N;y++)for(x=0;x<N;x++)cls[y*N+x]=cat[Math.floor(y*mh/N)*mw+Math.floor(x*mw/N)];
     if(res.close)res.close();
-    var xs=[],fy0=N,fn=0;for(y=0;y<N;y++)for(x=0;x<N;x++)if(cls[y*N+x]===3){fn++;xs.push(x);if(y<fy0)fy0=y;}
+    var xs=[],ys=[],fy0=N,fn=0;for(y=0;y<N;y++)for(x=0;x<N;x++)if(cls[y*N+x]===3){fn++;xs.push(x);ys.push(y);if(y<fy0)fy0=y;}
     if(fn<N*N*0.004)return null;
     xs.sort(function(a,b){return a-b});var fx0=xs[Math.floor(xs.length*0.02)],fx1=xs[Math.floor(xs.length*0.98)];
     var fw=Math.max(8,fx1-fx0+1),cx=(fx0+fx1)/2,s=40/fw;
@@ -358,8 +358,25 @@ var CARTOON=(function(){
     var beard=0;for(ty=60;ty<=74;ty++)for(tx=50;tx<=78;tx++)if(hair[ty*128+tx])beard++;
     var hat=0;for(ty=0;ty<40;ty++)for(tx=0;tx<128;tx++)if(acc[ty*128+tx])hat++;
     for(ty=40;ty<128;ty++)for(tx=0;tx<128;tx++)acc[ty*128+tx]=0;
-    var hairCol=hp.length>120?pop(med(upper(hp,0.55)),1.15):null;
-    return {skin:sp.length?pop(sh(med(upper(sp,0.5)),1.04),1.05):[230,190,160],hair:hairCol,top:top,accent:accent,
+    /* --- colour: white-balance from the (usually light, neutral) backdrop, then sample the middle tones, not highlights or shadows --- */
+    function band(a,lo,hi){var b2=a.slice().sort(function(p,q){return lum(p)-lum(q)});return b2.slice(Math.floor(b2.length*lo),Math.max(Math.floor(b2.length*lo)+1,Math.floor(b2.length*hi)));}
+    var bg=[];for(i=0;i<N*N;i+=5)if(cls[i]===0){var jb=i*4;bg.push([d[jb],d[jb+1],d[jb+2]]);}
+    var gain=[1,1,1];if(bg.length>200){var wref=med(upper(bg,0.15)),wl=lum(wref),spread=Math.max(wref[0],wref[1],wref[2])-Math.min(wref[0],wref[1],wref[2]);
+      if(wl>90&&spread<60){var av=(wref[0]+wref[1]+wref[2])/3;gain=wref.map(function(v){return Math.max(0.86,Math.min(1.16,av/Math.max(1,v)))});}}
+    function wb(c3){return c3?[0,1,2].map(function(k){return Math.max(0,Math.min(255,Math.round(c3[k]*gain[k])))}):c3;}
+    ys.sort(function(a,b){return a-b});var fy1=ys[Math.floor(ys.length*0.98)]||fy0+fw,fh=Math.max(8,fy1-fy0);
+    function region(x0,x1,y0,y1,test){var out=[];for(var yy=Math.max(0,Math.round(y0));yy<=Math.min(N-1,Math.round(y1));yy++)for(var xx=Math.max(0,Math.round(x0));xx<=Math.min(N-1,Math.round(x1));xx++){var q2=yy*N+xx;if(!test||test(cls[q2])){var jj=q2*4;out.push([d[jj],d[jj+1],d[jj+2]]);}}return out;}
+    var cheeks=region(fx0+fw*0.18,fx1-fw*0.18,fy0+fh*0.38,fy0+fh*0.72,function(k3){return k3===3});
+    var skinCol=cheeks.length>30?med(band(cheeks,0.35,0.85)):(sp.length?med(upper(sp,0.5)):[230,190,160]);skinCol=pop(wb(skinCol),1.04);
+    var hairCol=hp.length>120?wb(med(band(hp,0.25,0.75))):null;if(hairCol){var hs=Math.max.apply(null,hairCol)-Math.min.apply(null,hairCol);hairCol=hs<22?hairCol:pop(hairCol,1.1);}
+    /* eyes: darkest pixels where the eyes sit; lips: the reddest pixels around the mouth */
+    var eyeCol=null,eyes=region(fx0+fw*0.2,fx0+fw*0.45,fy0+fh*0.36,fy0+fh*0.52).concat(region(fx0+fw*0.55,fx0+fw*0.8,fy0+fh*0.36,fy0+fh*0.52));
+    if(eyes.length>20){var dk=band(eyes,0,0.12),ec=wb(med(dk));if(lum(ec)<120)eyeCol=ec;}
+    var lipsCol=null,mouth=region(fx0+fw*0.36,fx0+fw*0.64,fy0+fh*0.7,fy0+fh*0.88);
+    if(mouth.length>20&&beard<=60){var rd=function(p){return p[0]-(p[1]+p[2])/2};var mm=mouth.slice().sort(function(a,b){return rd(b)-rd(a)}).slice(0,Math.max(3,Math.floor(mouth.length*0.2))),lc=wb(med(mm));
+      if(rd(lc)-rd(skinCol)>18)lipsCol=pop(lc,1.1);}
+    var topW=top?wb(top):top,accW=accent?wb(accent):accent;
+    return {skin:skinCol,skinX:true,photo:true,eyeCol:eyeCol,lips:lipsCol,stubble:beard>35&&beard<=90&&!!hairCol,hair:hairCol,top:topW,accent:accW,
       glasses:gp.length>30,glassCol:gp.length?med(gp):[30,30,40],beard:beard>90&&!!hairCol,
       hat:hat>120,hatCol:ap.length?pop(med(ap),1.1):null,hairMask:hairCol?hair:null,accMask:hat>120?acc:null};}
 
@@ -390,6 +407,9 @@ var CARTOON=(function(){
     var pc=F.pants?F.pants:lum(F.top)<70?[70,64,86]:(lum(F.top)>170?[92,78,62]:[62,74,112]),pt=tones(pc),bt=tones(F.shoes||[92,58,40]),blt=tones([92,58,40]);
     var HG=hr?(F.hg?fromRle(F.hg):grid(F.hairMask)):null,AG=(F.hat&&F.hatCol)?grid(F.accMask):null;
     if(HG&&F.fringe){for(var fy=FT-2;fy<=FT+9;fy++)for(var fx=22;fx<=43;fx++){if(!(inE(fx,fy,32.5,FT+9.5,10.4,10.6)||fy<FT+1))continue;var edge=FT+8+((fx%4<2)?1:0);if(fy>edge)continue;HG[fy*G+fx]=1;}}
+    /* photo characters: close any gap between the hair and the top of the head, so hair never floats */
+    if(HG&&F.photo){for(var hx2=22;hx2<=43;hx2++){var low=-1;for(var hy2=0;hy2<=FT+2;hy2++)if(HG[hy2*G+hx2])low=hy2;if(low<0)continue;
+      var ht2=-1;for(hy2=FT-1;hy2<=FT+10;hy2++)if(inE(hx2,hy2,32.5,FT+9.5,9.8,10)){ht2=hy2;break;}if(ht2<0)continue;for(hy2=low;hy2<=ht2+1;hy2++)HG[hy2*G+hx2]=1;}}
     var hairAt=function(X,Y){return HG&&X>=0&&Y>=0&&X<G&&Y<G&&HG[Y*G+X]};
     var curlOut=function(X,Y){if(!F.curly)return false;var edge=!hairAt(X-1,Y)||!hairAt(X+1,Y)||!hairAt(X,Y-1)||!hairAt(X,Y+1);return edge&&((X+2*Y)%3===0);};
     var curlCol=function(X,Y,base){if(!F.curly)return base;var k=(X*2+Y*3)%7;return k===0?hr.hi:(k===4?hr.dk:base);};
@@ -448,6 +468,8 @@ var CARTOON=(function(){
       var win=inE(X,Y,32.5,FT+12.5,7.2,7.2)&&!((F.fringe||F.sweep)&&Y<=FT+9),beardZone=F.beard&&!F.trim&&Y>=FT+12&&Y<=FT+19;if(win&&!beardZone)continue;if(Y>FT+16&&!beardZone&&X>=24&&X<=41)continue;
       var topEdge=!hairAt(X,Y-1),lowEdge=!hairAt(X,Y+1),rightEdge=!hairAt(X+1,Y);
       if(curlOut(X,Y))continue;var top2=!hairAt(X,Y-2);var col=hr.b;if((topEdge||top2)&&X<38&&Y<FT+10)col=hr.hi;else if(lowEdge||rightEdge||X>=40)col=hr.lo;
+      if(F.photo&&!F.curly&&!topEdge&&!lowEdge&&((X*5+Y*3)%11===0||(X*7+Y)%13===0))col=(col===hr.hi)?hr.b:hr.lo;
+      if(F.photo&&!topEdge&&Y>=FT-3&&Y<=FT-1&&X>=26&&X<=31&&col!==hr.lo)col=hr.hi;
       if(F.buzz)col=((X+Y)%2===0)?hr.b:[Math.round((hr.b[0]+sk.lo[0])/2),Math.round((hr.b[1]+sk.lo[1])/2),Math.round((hr.b[2]+sk.lo[2])/2)];
       if(F.sweep&&X>=23&&X<=42){var we=Math.round(FT+1+8.2*Math.sin(Math.PI*(X-21)/30));if(Y===we-2||(Y===we-3&&X<30))col=hr.hi;else if(Y===we)col=hr.lo;}
       P(X,Y+b,curlCol(X,Y,col),1);}
@@ -466,13 +488,21 @@ var CARTOON=(function(){
     /* eyes, mouth, glasses */
     if(F.shadow){var es=F.shadow,es2=pop(sh(es,1.2),1.05);[[27,29],[35,37]].forEach(function(e){P(e[0],FT+9+b,es,7);P(e[0]+1,FT+9+b,es2,7);P(e[1],FT+9+b,es,7);P(e[0],FT+10+b,es,7);P(e[1],FT+10+b,sh(es,.85),7);});}
     if(F.liner){var ln=[18,12,16];rect(27,FT+9+b,29,FT+9+b,ln,7);P(26,FT+9+b,ln,7);P(25,FT+8+b,ln,7);rect(35,FT+9+b,37,FT+9+b,ln,7);P(38,FT+9+b,ln,7);P(39,FT+8+b,ln,7);}
-    var eye=[30,22,40];rect(28,FT+10+b,28,FT+12+b,eye,7);rect(36,FT+10+b,36,FT+12+b,eye,7);P(28,FT+10+b,[250,250,250],7);P(36,FT+10+b,[250,250,250],7);
+    var eye=[30,22,40];
+    if(F.photo){var iris=F.eyeCol?sh(F.eyeCol,.9):[46,34,30],ew=[246,244,240];
+      /* 2-wide eyes: white, iris, highlight */
+      [[27,28],[36,37]].forEach(function(e2){P(e2[0],FT+11+b,ew,7);rect(e2[1],FT+10+b,e2[1],FT+12+b,iris,7);P(e2[0],FT+10+b,sh(iris,.7),7);P(e2[0],FT+12+b,sh(iris,.7),7);P(e2[1],FT+10+b,[255,255,255],7);});
+      /* eyebrows in a darker hair tone (skip where the fringe already covers) */
+      var bw=hr?sh(hr.b,lum(hr.b)>150?.62:.72):[70,52,42];[[26,8],[27,7],[28,7],[29,8],[35,8],[36,7],[37,7],[38,8]].forEach(function(q5){if(!hairAt(q5[0],FT+q5[1]))P(q5[0],FT+q5[1]+b,bw,7);});
+      /* nose shading */
+      P(33,FT+13+b,sk.lo,2);P(32,FT+14+b,sk.lo,2);P(33,FT+14+b,sk.dk,2);}
+    else{rect(28,FT+10+b,28,FT+12+b,eye,7);rect(36,FT+10+b,36,FT+12+b,eye,7);P(28,FT+10+b,[250,250,250],7);P(36,FT+10+b,[250,250,250],7);}
     P(32,FT+16+b,F.beard?[230,190,180]:sk.dk,7);P(33,FT+16+b,F.beard?[230,190,180]:sk.dk,7);
     if(F.earring){P(22,FT+11+b,[236,236,246],7);P(22,FT+12+b,[176,176,196],7);}
     if(F.part&&HG){for(var py2=FT-3;py2<=FT+1;py2++)if(hairAt(33,py2))P(33,py2+b,hr.dk,1);}
     if(F.piercing){P(33,FT+14+b,sk.lo,7);P(34,FT+14+b,[214,220,232],7);P(34,FT+13+b,[255,255,255],7);}
     if(F.lips){var lp=F.lips;P(31,FT+16+b,lp,7);P(34,FT+16+b,lp,7);P(32,FT+16+b,sh(lp,.8),7);P(33,FT+16+b,sh(lp,.8),7);P(32,FT+17+b,pop(sh(lp,1.15),1),7);P(33,FT+17+b,pop(sh(lp,1.15),1),7);}
-    if(!F.beard){P(26,FT+14+b,pop([235,140,140],1),7);P(38,FT+14+b,pop([235,140,140],1),7);}
+    if(!F.beard){var blush=F.photo?[Math.round(sk.b[0]*.7+235*.3),Math.round(sk.b[1]*.7+120*.3),Math.round(sk.b[2]*.7+120*.3)]:pop([235,140,140],1);P(26,FT+14+b,blush,7);P(38,FT+14+b,blush,7);if(F.photo){P(25,FT+14+b,blush,7);P(39,FT+14+b,blush,7);}}
     if(F.glasses&&F.roundGlasses){var gr=lum(F.glassCol)>140?sh(F.glassCol,.45):sh(F.glassCol,.9);
       [[24,30],[34,40]].forEach(function(g){for(var X=g[0]+1;X<=g[1]-1;X++){P(X,FT+8+b,gr,8);P(X,FT+14+b,gr,8)}for(var y=FT+9;y<=FT+13;y++){P(g[0],y+b,gr,8);P(g[1],y+b,gr,8)}});
       P(31,FT+10+b,gr,8);P(32,FT+9+b,gr,8);P(33,FT+10+b,gr,8);P(23,FT+10+b,gr,8);P(41,FT+10+b,gr,8);}
