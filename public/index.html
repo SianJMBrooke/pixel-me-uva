@@ -72,7 +72,7 @@
   #intro .box{width:min(900px,92vw);background:var(--panel);border:.6vmin solid var(--p1);box-shadow:0 0 3vmin rgba(41,227,255,.5);padding:2.6vmin 3vmin;display:flex;flex-direction:column;align-items:center;gap:1.4vmin}
   #intro .eyebrow{color:var(--dim);font-size:clamp(9px,1.4vmin,15px);letter-spacing:2px}
   #intro h2{margin:0;color:var(--gold);font-weight:normal;font-size:clamp(20px,4.4vmin,48px);text-shadow:0 .5vmin 0 var(--p0)}
-  #intro canvas{width:min(46vmin,70vw);aspect-ratio:4/3;background:#050505;border:.4vmin solid #23292c;image-rendering:pixelated}
+  #intro canvas{width:min(34vmin,60vw);aspect-ratio:4/3;background:#050505;border:.4vmin solid #23292c;image-rendering:pixelated}
   #intro ol{margin:0;padding-left:3.6vmin;color:var(--ink);font-size:clamp(10px,1.7vmin,18px);line-height:1.9;max-width:62ch}
   #intro .ctl{color:var(--lime);font-size:clamp(9px,1.5vmin,16px);text-align:center;line-height:1.7}
   #intro .readyrow{display:flex;gap:2vmin;flex-wrap:wrap;justify-content:center}
@@ -248,7 +248,7 @@
 
   <section id="board" class="screen">
     <div class="title" style="font-size:clamp(16px,3.4vmin,38px)" data-i18n-html="hallTitle"></div>
-    <div class="tbl"><table><thead><tr><th>#</th><th></th><th data-i18n="thName"></th><th data-i18n="thWins"></th><th data-i18n="thPlayed"></th><th data-i18n="thPct"></th><th>PONG</th><th>WIRES</th><th>FUNDING</th><th>DASH</th><th></th></tr></thead><tbody id="lbBody"></tbody></table></div>
+    <div class="tbl"><table><thead><tr><th>#</th><th></th><th data-i18n="thName"></th><th data-i18n="thWins"></th><th data-i18n="thPlayed"></th><th data-i18n="thPct"></th><th>PONG</th><th>WIRES</th><th>FUNDING</th><th>OFFICE</th><th></th></tr></thead><tbody id="lbBody"></tbody></table></div>
     <div class="admin">
       <button class="btn big" id="btnBack" data-i18n="back"></button>
       <button class="btn alt" id="btnExport" data-i18n="export"></button>
@@ -309,7 +309,7 @@ function __unused(){
   if(typeof S!=='undefined'&&S.screen==='lobby'){renderPanel(0);renderPanel(1);}}
 var DIL_BAG=[];
 var ROB_FEAT=function(){return [[242,200,178],[170,168,164],[70,74,84],null,0,1,DIL_FEATS[11][6],{robot:1,skinX:1,mean:1}];};
-function newBot(i){var F=featF(ROB_FEAT()),fr=CARTOON.frames(F);return {i:i,state:'ready',name:'ROB.AI',frames:fr,thumb:makeThumb(fr),count:0,returning:false,note:'',dil:'Rob.ai',bot:true,speed:1};}
+function newBot(i){var F=featF(ROB_FEAT()),fr=CARTOON.frames(F);return {i:i,state:'ready',name:'ROB.OT',frames:fr,thumb:makeThumb(fr),count:0,returning:false,note:'',dil:'Rob.ot',bot:true,speed:0.8};}
 function pickDil(avoid){if(!DIL.length)return null;if(!DIL_BAG.length){DIL_BAG=DIL.map(function(_,i){return i}).sort(function(){return Math.random()-.5});}
   var i=DIL_BAG.pop();if(DIL[i].full===avoid&&DIL.length>1)return pickDil(avoid);return DIL[i];}
 /* ---------- cartoon character builder: photo -> features -> 128x128 cartoon ---------- */
@@ -572,7 +572,7 @@ var I18N={
   playingAs:'playing as',letsGo:"LET'S GO!",waitingFor:'Waiting for player {n}…',startAgain:'START AGAIN',chooseTitle:'CHOOSE YOUR <span>GAME</span>',newPlayers:'NEW PLAYERS',
   descPong:'Catch bytes, aim, send them back<br>First to 5 points',descCycles:"Lay wire · don't touch any<br>or get a shock! Best of 3",descCoins:'Collect money to fund your research<br>45 seconds',descDash:'A or up = jump · down = duck<br>Dodge everything! Last runner standing',btnDash:'JUMP',
   holdQuit:'HOLD TO QUIT',btnPong:'SEND',btnCycles:'BOOST',btnCoins:'DASH',draw:"IT'S A DRAW!",wins:'{name} WINS!',totalWins:'total wins',rematch:'REMATCH',otherGame:'OTHER GAME',
-  hallTitle:'HALL OF <span>FAME</span>',howTo:'HOW TO PLAY',twoP:'2 PLAYERS',vsRob:'1 PLAYER: VS ROB.AI',orLbl:'or',botHint:'Computer player',removeRob:'REMOVE ROB.AI',cpu:'COMPUTER',p1Ready:'P1 READY',p2Ready:'P2 READY',readyWait:'Both players tap READY (or A) to start',autoStart:'Starting by itself in {n}',idleMsg:'Nobody playing? Back to the start in {n}',zapped:'ZAPPED!',memberOf:'{i} of {n}',inPong:['Each packet carries one byte: 8 bits (lit = 1, dark = 0) that make one letter.','Catch the packet with your port. The letter appears on your computer screen.','Aim with up/down and press A quickly to send the next byte back. Hold it too long and your computer overheats and explodes! Drop or burn a packet and your opponent scores. First to 5.'],bytesSent:'BYTES SENT',packetLost:'PACKET LOST!',pressSend:'PRESS A TO SEND',overheating:'OVERHEATING!',overheated:'KABOOM! OVERHEATED',heat:'HEAT',ctlPong:'Up / down = move and aim · A = send · hold B = move faster',inCycles:['You are laying live wire behind you as you walk.','Touch a wire (yours or theirs) or the wall and you get a shock!','Last one standing wins the round. Best of 3.'],ctlCycles:'D-pad = turn · hold A = walk faster (uses power)',inCoins:['Your research needs funding! Every euro coin is €10K.','Golden grant letters are worth €50K. Dash into the other player to knock €30K of their funding loose.','The best-funded researcher after 45 seconds wins.'],fundingFor:'RESEARCH FUNDING',grantWon:'GRANT!',ctlCoins:'D-pad = move · A = dash',inDash:['Race through the office without tripping over the equipment.','Jump over bins, chairs, printers and filing cabinets. Duck under the owls.','You have 3 lives. Last runner standing wins.'],ctlDash:'A or up = jump · down = duck',lbOnline:'SHARED · LIVE',lbOffline:'OFFLINE · WILL SYNC',lbLocal:'THIS DEVICE ONLY',codeTitle:'ENTER CODE',cancel:'CANCEL',confirmDel:'Delete {name} from the leaderboard?',confirmReset:'Delete ALL scores?',confirmImport:'Merge the imported scores?',wrongCode:'Wrong code',tooMany:'Too many wrong codes. Wait 10 minutes.',noServer:'Can\'t reach the leaderboard. Try again when online.',thName:'NAME',thWins:'WINS',thPlayed:'PLAYED',thPct:'WIN %',export:'EXPORT',import:'IMPORT',resetHold:'RESET ALL',keepHolding:'KEEP HOLDING…',resetDone:'RESET DONE',
+  hallTitle:'HALL OF <span>FAME</span>',howTo:'HOW TO PLAY',twoP:'2 PLAYERS',vsRob:'1 PLAYER: VS ROB.OT',orLbl:'or',botHint:'Computer player',removeRob:'REMOVE ROB.OT',cpu:'COMPUTER',p1Ready:'P1 READY',p2Ready:'P2 READY',readyWait:'Both players tap READY (or A) to start',autoStart:'Starting by itself in {n}',idleMsg:'Nobody playing? Back to the start in {n}',zapped:'ZAPPED!',memberOf:'{i} of {n}',inPong:['Each packet carries one byte: 8 bits (lit = 1, dark = 0) that make one letter.','Catch the packet with your port. The letter appears on your computer screen.','Aim with up/down and press A quickly to send the next byte back. Hold it too long and your computer overheats and explodes! Drop or burn a packet and your opponent scores. First to 5.'],bytesSent:'BYTES SENT',packetLost:'PACKET LOST!',pressSend:'PRESS A TO SEND',overheating:'OVERHEATING!',overheated:'KABOOM! OVERHEATED',heat:'HEAT',ctlPong:'Up / down = move and aim · A = send · hold B = move faster',inCycles:['You are laying live wire behind you as you walk.','Touch a wire (yours or theirs) or the wall and you get a shock!','Last one standing wins the round. Best of 3.'],ctlCycles:'D-pad = turn · hold A = walk faster (uses power)',inCoins:['Your research needs funding! Every euro coin is €10K.','Golden grant letters are worth €50K. Dash into the other player to knock €30K of their funding loose.','The best-funded researcher after 45 seconds wins.'],fundingFor:'RESEARCH FUNDING',grantWon:'GRANT!',ctlCoins:'D-pad = move · A = dash',inDash:['It is home time! Race out of the office without tripping over the equipment.','Jump over bins, chairs, printers and filing cabinets. Duck under the orange owls.','You have 3 lives. Last runner standing wins.'],ctlDash:'A or up = jump · down = duck',lbOnline:'SHARED · LIVE',lbOffline:'OFFLINE · WILL SYNC',lbLocal:'THIS DEVICE ONLY',codeTitle:'ENTER CODE',cancel:'CANCEL',confirmDel:'Delete {name} from the leaderboard?',confirmReset:'Delete ALL scores?',confirmImport:'Merge the imported scores?',wrongCode:'Wrong code',tooMany:'Too many wrong codes. Wait 10 minutes.',noServer:'Can\'t reach the leaderboard. Try again when online.',thName:'NAME',thWins:'WINS',thPlayed:'PLAYED',thPct:'WIN %',export:'EXPORT',import:'IMPORT',resetHold:'RESET ALL',keepHolding:'KEEP HOLDING…',resetDone:'RESET DONE',
   noPlayed:'No games played yet',badFile:'That file is not a leaderboard export',fullscreen:'FULLSCREEN',
   cReady:'READY',cGo:'GO!',round:'ROUND {n}',takesIt:'{name} TAKES IT',dblCrash:'DOUBLE SHOCK!',cDraw:'DRAW!',cWins:'{name} WINS!'},
  nl:{sub:'1 of 2 spelers · kies een lid van het Digital Interactions Lab of maak een foto · strijd!',leaderboard:'LEADERBOARD',topPlayers:'TOPSPELERS',noGames:'Nog geen spellen.<br>Wees de eerste!',
@@ -582,7 +582,7 @@ var I18N={
   playingAs:'speelt als',letsGo:'DAAR GAAN WE!',waitingFor:'Wachten op speler {n}…',startAgain:'OPNIEUW BEGINNEN',chooseTitle:'KIES JE <span>SPEL</span>',newPlayers:'NIEUWE SPELERS',
   descPong:'Vang bytes, mik, stuur terug<br>Wie het eerst 5 punten heeft',descCycles:'Leg draad · raak er geen<br>of krijg een schok! Beste van 3',descCoins:'Verzamel geld voor je onderzoek<br>45 seconden',descDash:'A of omhoog = springen · omlaag = bukken<br>Ontwijk alles! Wie het langst rent wint',btnDash:'SPRING',
   holdQuit:'HOUD VAST OM TE STOPPEN',btnPong:'STUUR',btnCycles:'BOOST',btnCoins:'SPRINT',draw:'GELIJKSPEL!',wins:'{name} WINT!',totalWins:'overwinningen',rematch:'REVANCHE',otherGame:'ANDER SPEL',
-  hallTitle:'HALL OF <span>FAME</span>',howTo:'ZO SPEEL JE',twoP:'2 SPELERS',vsRob:'1 SPELER: TEGEN ROB.AI',orLbl:'of',botHint:'Computerspeler',removeRob:'ROB.AI WEGHALEN',cpu:'COMPUTER',p1Ready:'P1 KLAAR',p2Ready:'P2 KLAAR',readyWait:'Beide spelers tikken op KLAAR (of A) om te starten',autoStart:'Start vanzelf over {n}',idleMsg:'Niemand aan het spelen? Terug naar start over {n}',zapped:'GESCHOKT!',memberOf:'{i} van {n}',inPong:['Elk pakketje draagt één byte: 8 bits (aan = 1, uit = 0) die samen één letter vormen.','Vang het pakketje met je poort. De letter verschijnt op je computerscherm.','Mik met omhoog/omlaag en druk snel op A om de volgende byte terug te sturen. Houd je hem te lang vast, dan raakt je computer oververhit en ontploft hij! Laat je een pakketje vallen of verbrand je het, dan scoort de ander. Wie het eerst 5 heeft wint.'],bytesSent:'BYTES VERSTUURD',packetLost:'PAKKET KWIJT!',pressSend:'DRUK A OM TE STUREN',overheating:'OVERVERHIT!',overheated:'KABOEM! OVERVERHIT',heat:'HITTE',ctlPong:'Omhoog / omlaag = bewegen en mikken · A = versturen · B ingedrukt = sneller',inCycles:['Je legt een stroomdraad achter je neer terwijl je loopt.','Raak je een draad (van jezelf of de ander) of de muur, dan krijg je een schok!','Wie overblijft wint de ronde. Beste van 3.'],ctlCycles:'Pijltjes = draaien · A ingedrukt = sneller lopen (kost energie)',inCoins:['Je onderzoek heeft geld nodig! Elke euromunt is €10K.','Gouden subsidiebrieven zijn €50K waard. Sprint tegen de ander aan om €30K van hun geld los te slaan.','Wie na 45 seconden het meeste onderzoeksgeld heeft wint.'],fundingFor:'ONDERZOEKSGELD',grantWon:'SUBSIDIE!',ctlCoins:'Pijltjes = bewegen · A = sprinten',inDash:['Ren door het kantoor zonder over de spullen te struikelen.','Spring over prullenbakken, stoelen, printers en archiefkasten. Buk voor de uilen.','Je hebt 3 levens. Wie het langst blijft rennen wint.'],ctlDash:'A of omhoog = springen · omlaag = bukken',lbOnline:'GEDEELD · LIVE',lbOffline:'OFFLINE · SYNCT LATER',lbLocal:'ALLEEN DIT APPARAAT',codeTitle:'VOER CODE IN',cancel:'ANNULEREN',confirmDel:'{name} van de ranglijst verwijderen?',confirmReset:'ALLE scores wissen?',confirmImport:'Geïmporteerde scores samenvoegen?',wrongCode:'Verkeerde code',tooMany:'Te vaak een verkeerde code. Wacht 10 minuten.',noServer:'Ranglijst niet bereikbaar. Probeer het later opnieuw.',thName:'NAAM',thWins:'GEWONNEN',thPlayed:'GESPEELD',thPct:'WIN %',export:'EXPORTEREN',import:'IMPORTEREN',resetHold:'ALLES WISSEN',keepHolding:'BLIJF VASTHOUDEN…',resetDone:'GEWIST',
+  hallTitle:'HALL OF <span>FAME</span>',howTo:'ZO SPEEL JE',twoP:'2 SPELERS',vsRob:'1 SPELER: TEGEN ROB.OT',orLbl:'of',botHint:'Computerspeler',removeRob:'ROB.OT WEGHALEN',cpu:'COMPUTER',p1Ready:'P1 KLAAR',p2Ready:'P2 KLAAR',readyWait:'Beide spelers tikken op KLAAR (of A) om te starten',autoStart:'Start vanzelf over {n}',idleMsg:'Niemand aan het spelen? Terug naar start over {n}',zapped:'GESCHOKT!',memberOf:'{i} van {n}',inPong:['Elk pakketje draagt één byte: 8 bits (aan = 1, uit = 0) die samen één letter vormen.','Vang het pakketje met je poort. De letter verschijnt op je computerscherm.','Mik met omhoog/omlaag en druk snel op A om de volgende byte terug te sturen. Houd je hem te lang vast, dan raakt je computer oververhit en ontploft hij! Laat je een pakketje vallen of verbrand je het, dan scoort de ander. Wie het eerst 5 heeft wint.'],bytesSent:'BYTES VERSTUURD',packetLost:'PAKKET KWIJT!',pressSend:'DRUK A OM TE STUREN',overheating:'OVERVERHIT!',overheated:'KABOEM! OVERVERHIT',heat:'HITTE',ctlPong:'Omhoog / omlaag = bewegen en mikken · A = versturen · B ingedrukt = sneller',inCycles:['Je legt een stroomdraad achter je neer terwijl je loopt.','Raak je een draad (van jezelf of de ander) of de muur, dan krijg je een schok!','Wie overblijft wint de ronde. Beste van 3.'],ctlCycles:'Pijltjes = draaien · A ingedrukt = sneller lopen (kost energie)',inCoins:['Je onderzoek heeft geld nodig! Elke euromunt is €10K.','Gouden subsidiebrieven zijn €50K waard. Sprint tegen de ander aan om €30K van hun geld los te slaan.','Wie na 45 seconden het meeste onderzoeksgeld heeft wint.'],fundingFor:'ONDERZOEKSGELD',grantWon:'SUBSIDIE!',ctlCoins:'Pijltjes = bewegen · A = sprinten',inDash:['Het is tijd om naar huis te gaan! Ren het kantoor uit zonder over de spullen te struikelen.','Spring over prullenbakken, stoelen, printers en archiefkasten. Buk voor de oranje uilen.','Je hebt 3 levens. Wie het langst blijft rennen wint.'],ctlDash:'A of omhoog = springen · omlaag = bukken',lbOnline:'GEDEELD · LIVE',lbOffline:'OFFLINE · SYNCT LATER',lbLocal:'ALLEEN DIT APPARAAT',codeTitle:'VOER CODE IN',cancel:'ANNULEREN',confirmDel:'{name} van de ranglijst verwijderen?',confirmReset:'ALLE scores wissen?',confirmImport:'Geïmporteerde scores samenvoegen?',wrongCode:'Verkeerde code',tooMany:'Te vaak een verkeerde code. Wacht 10 minuten.',noServer:'Ranglijst niet bereikbaar. Probeer het later opnieuw.',thName:'NAAM',thWins:'GEWONNEN',thPlayed:'GESPEELD',thPct:'WIN %',export:'EXPORTEREN',import:'IMPORTEREN',resetHold:'ALLES WISSEN',keepHolding:'BLIJF VASTHOUDEN…',resetDone:'GEWIST',
   noPlayed:'Nog geen spellen gespeeld',badFile:'Dit bestand is geen ranglijst-export',fullscreen:'VOLLEDIG SCHERM',
   cReady:'KLAAR',cGo:'START!',round:'RONDE {n}',takesIt:'{name} WINT DE RONDE',dblCrash:'DUBBELE SCHOK!',cDraw:'GELIJK!',cWins:'{name} WINT!'}};
 var LANG='en';try{LANG=localStorage.getItem(LANG_KEY)||'en'}catch(e){}
@@ -884,7 +884,7 @@ var FUN=['BLIP','ZAP','NOVA','PIXEL','BYTE','COMET','TURBO','RETRO','GLITCH','ME
 function renderPanel(i){var p=S.players[i],el=$('#panel'+i),h='<div class="ptag">P'+(i+1)+'</div>',other=S.players[1-i];
   if(p.state==='waiting'){h+='<div class="bigmsg blink">'+T('waiting',{n:i+1})+'</div><div class="hint">'+T('twoP')+'</div><button class="btn big" data-act="join">'+T('tapJoin')+'</button>'+
     (other.bot?'':'<div class="hint">'+T('orLbl')+'</div><button class="btn alt robbtn" data-act="bot">'+T('vsRob')+'</button>');}
-  else if(p.bot){h+='<canvas class="spritebig" width="256" height="256"></canvas><div class="namebox">ROB.AI</div><div class="ready">'+T('ready')+'</div><div class="hint">'+T('botHint')+'</div>'+
+  else if(p.bot){h+='<canvas class="spritebig" width="256" height="256"></canvas><div class="namebox">ROB.OT</div><div class="ready">'+T('ready')+'</div><div class="hint">'+T('botHint')+'</div>'+
     '<div class="hint blink">'+(other.state==='ready'?T('letsGo'):T('waitingFor',{n:2-i}))+'</div><button class="btn alt" data-act="cancel">'+T('removeRob')+'</button>';}
   else if(p.state==='choose'){h+='<div class="bigmsg">'+T('chooseHow')+'</div><div class="choose"><button class="btn big" data-act="dil">'+T('asDil')+'</button><button class="btn big alt" data-act="photo">'+T('fromPhoto')+'</button></div>'+
     '<div class="hint">'+T('chooseHint')+'</div><div class="row"><button class="btn alt" data-act="cancel">'+T('back')+'</button></div>';}
@@ -943,7 +943,7 @@ var GAMES={
   pong:{name:'PIXEL PONG',desc:'descPong',btn:'btnPong',make:function(){return Pong()}},
   cycles:{name:'LIVE WIRES',desc:'descCycles',btn:'btnCycles',make:function(){return Cycles()}},
   coins:{name:'FUNDING RUSH',desc:'descCoins',btn:'btnCoins',make:function(){return Coins()}},
-  dash:{name:'PIXEL DASH',desc:'descDash',btn:'btnDash',make:function(){return Dash()}}};
+  dash:{name:'LEAVING THE OFFICE',desc:'descDash',btn:'btnDash',make:function(){return Dash()}}};
 function renderSelect(){[0,1].forEach(function(i){$('#selNm'+i).textContent=S.players[i].name;});
   var h='';Object.keys(GAMES).forEach(function(k){h+='<div class="card" data-g="'+k+'"><canvas width="160" height="120" data-prev="'+k+'"></canvas><b>'+GAMES[k].name+'</b><i>'+T(GAMES[k].desc)+'</i></div>';});
   $('#cards').innerHTML=h;}
@@ -967,8 +967,8 @@ function startGame(id){S.gameId=id;S.game=GAMES[id].make();S.endAt=0;S.recorded=
 
 /* ---------- touch controls ---------- */
 function buildPads(){BOT.reset();[0,1].forEach(function(i){var p=S.players[i],el=$('#pad'+i);input[i]={up:0,down:0,left:0,right:0,a:0,b:0};
-  if(p.bot){el.innerHTML='<div class="pn">P'+(i+1)+'<br>ROB.AI</div><div class="cpu">'+T('cpu')+'</div>';return;}
-  el.innerHTML='<div class="pn">P'+(i+1)+'<br>'+esc(p.name)+'<br><span class="kbd">'+(i?'⌨ I J K L · U=A · O=B':'⌨ ← ↑ → ↓ · A · B')+'</span></div><div class="dpad"><i class="u"></i><i class="l"></i><i class="c"></i><i class="r"></i><i class="d"></i></div>'+
+  if(p.bot){el.innerHTML='<div class="pn">P'+(i+1)+'<br>ROB.OT</div><div class="cpu">'+T('cpu')+'</div>';return;}
+  el.innerHTML='<div class="pn">P'+(i+1)+'<br>'+esc(p.name)+'<br><span class="kbd">'+((i&&!S.players[0].bot)?'⌨ I J K L · U=A · O=B':'⌨ ← ↑ → ↓ · A · B')+'</span></div><div class="dpad"><i class="u"></i><i class="l"></i><i class="c"></i><i class="r"></i><i class="d"></i></div>'+
     '<div class="abtns"><button class="abtn b" data-b="b">B</button><button class="abtn" data-b="a">A<span class="lab">'+T(GAMES[S.gameId].btn)+'</span></button></div>';
   bindDpad(el.querySelector('.dpad'),i);el.querySelectorAll('.abtn').forEach(function(b){bindBtn(b,i,b.dataset.b)});});}
 function relabelPads(){document.querySelectorAll('.abtn .lab').forEach(function(l){l.textContent=T(GAMES[S.gameId].btn)});}
@@ -990,9 +990,10 @@ var KEYS={ArrowUp:[0,'up'],ArrowDown:[0,'down'],ArrowLeft:[0,'left'],ArrowRight:
   KeyI:[1,'up'],KeyK:[1,'down'],KeyJ:[1,'left'],KeyL:[1,'right'],KeyU:[1,'a'],KeyO:[1,'b']};
 var PADCLS={up:'.u',down:'.d',left:'.l',right:'.r'};
 function keyLight(i,k,on){var el=document.getElementById('pad'+i);if(!el)return;var t=k==='a'||k==='b'?el.querySelector('.abtn[data-b="'+k+'"]'):el.querySelector('.dpad '+PADCLS[k]);if(t)t.classList.toggle('on',on);}
-addEventListener('keydown',function(e){var m=KEYS[e.code];if(!m||$('#codeDlg').classList.contains('on'))return;if(S.players[m[0]]&&S.players[m[0]].bot)return;
-  input[m[0]][m[1]]=1;keyLight(m[0],m[1],true);if(S.screen==='play'||e.code.indexOf('Arrow')===0||e.code==='Space')e.preventDefault();});
-addEventListener('keyup',function(e){var m=KEYS[e.code];if(!m)return;if(S.players[m[0]]&&S.players[m[0]].bot)return;input[m[0]][m[1]]=0;keyLight(m[0],m[1],false);});
+function keySlot(i){return S.players[i]&&S.players[i].bot?1-i:i;}   /* against Rob.ot, every key controls the human player */
+addEventListener('keydown',function(e){var m=KEYS[e.code];if(!m||$('#codeDlg').classList.contains('on'))return;var i=keySlot(m[0]);
+  input[i][m[1]]=1;keyLight(i,m[1],true);if(m[1]==='a'&&INTRO.id&&!INTRO.rdy[i]){INTRO.rdy[i]=true;SFX.blip();renderIntro();}if(S.screen==='play'||e.code.indexOf('Arrow')===0||e.code==='Space')e.preventDefault();});
+addEventListener('keyup',function(e){var m=KEYS[e.code];if(!m)return;var i=keySlot(m[0]);input[i][m[1]]=0;keyLight(i,m[1],false);});
 
 /* hold to quit */
 (function(){var b=$('#btnQuit'),bar=b.querySelector('.bar'),t0=0,raf=0;
@@ -1000,14 +1001,14 @@ addEventListener('keyup',function(e){var m=KEYS[e.code];if(!m)return;if(S.player
   function stop(){cancelAnimationFrame(raf);t0=0;bar.style.width='0';}
   b.addEventListener('pointerdown',function(e){e.preventDefault();t0=performance.now();tick();});['pointerup','pointercancel','pointerleave'].forEach(function(ev){b.addEventListener(ev,stop)});})();
 
-/* ---------- Rob.ai: computer opponent ---------- */
+/* ---------- Rob.ot: computer opponent ---------- */
 var BOT=(function(){var M=[{},{}];
   function reset(){M=[{},{}];}
   function press(i,k,m){var key='_'+k;if(m[key]){input[i][k]=0;m[key]=0;return;}input[i][k]=1;m[key]=1;}   /* one-frame tap, so edge detection sees it */
   function pong(G,i,dt,m){var I=input[i],px=i===0?46:754,b=G.ball;I.up=I.down=I.left=I.right=0;I.b=0;var target=300;
-    if(G.held===i){if(m.aim==null){m.aim=90+Math.random()*420;m.wait=0.35+Math.random()*0.8;}target=m.aim;m.wait-=dt;if(m.wait<=0&&G.wait<=0){press(i,'a',m);m.aim=null;}else input[i].a=0;}
+    if(G.held===i){if(m.aim==null){m.aim=90+Math.random()*420;m.wait=Math.random()<0.12?2.5:0.6+Math.random()*0.9;}target=m.aim;m.wait-=dt;if(m.wait<=0&&G.wait<=0){press(i,'a',m);m.aim=null;}else input[i].a=0;}
     else{m.aim=null;input[i].a=0;var toward=i===0?b.vx<0:b.vx>0;
-      if(toward&&G.held<0){if(m.errFor!==G.sent){m.errFor=G.sent;m.err=(Math.random()*2-1)*(40+Math.min(40,G.sent*2));}
+      if(toward&&G.held<0&&(i===0?b.x<500:b.x>300)){if(m.errFor!==G.sent){m.errFor=G.sent;m.err=(Math.random()*2-1)*(75+Math.min(50,G.sent*3));m.react=0.12+Math.random()*0.2;}
         var tx=Math.abs((px-b.x)/(b.vx||1)),y=b.y+b.vy*tx,lo=28,hi=572;for(var k=0;k<6&&(y<lo||y>hi);k++){if(y<lo)y=2*lo-y;if(y>hi)y=2*hi-y;}target=y+m.err;}
       else target=300;}
     var dy=target-G.y[i];if(dy>14)I.down=1;else if(dy<-14)I.up=1;}
@@ -1016,21 +1017,22 @@ var BOT=(function(){var M=[{},{}];
     while(st.length&&n<lim){var c=st.pop();n++;[[1,0],[-1,0],[0,1],[0,-1]].forEach(function(v){var nx=c[0]+v[0],ny=c[1]+v[1],k=ny*80+nx;if(!seen[k]&&free(G,nx,ny)){seen[k]=1;st.push([nx,ny]);}});}return n;}
   function cycles(G,i,dt,m){var I=input[i],q=G.pl[i];I.up=I.down=I.left=I.right=0;I.a=0;if(!q||!q.alive)return;
     var d=q.nd||q.d,opts=[d,[d[1],-d[0]],[-d[1],d[0]]],best=null,bs=-1;
-    opts.forEach(function(o,k){var sc=space(G,q.x+o[0],q.y+o[1],160);if(k===0)sc+=6;if(k>0&&Math.random()<0.02)sc+=10;if(sc>bs){bs=sc;best=o;}});
+    if(m.t==null)m.t=0;m.t-=dt;if(m.t>0&&free(G,q.x+d[0],q.y+d[1]))return;m.t=0.05+Math.random()*0.1;   /* reacts a little late */
+    opts.forEach(function(o,k){var sc=space(G,q.x+o[0],q.y+o[1],35);if(k===0)sc+=4;if(k>0&&Math.random()<0.05)sc+=8;if(sc>bs){bs=sc;best=o;}});
     if(best){if(best[0]===1)I.right=1;else if(best[0]===-1)I.left=1;else if(best[1]===1)I.down=1;else I.up=1;}
     var run=0,x=q.x,y=q.y;while(run<20&&free(G,x+d[0],y+d[1])){x+=d[0];y+=d[1];run++;}I.a=(run>=18&&q.boost>0.5&&Math.random()<0.5)?1:0;}
   function coins(G,i,dt,m){var I=input[i],q=G.pl[i],o=G.pl[1-i];I.up=I.down=I.left=I.right=0;input[i].a=0;if(!q)return;
     var best=null,bv=-1;G.coins.forEach(function(c){var dd=Math.hypot(c.x-q.x,c.y-q.y)+40,v=(c.grant?5:1)/dd;if(v>bv){bv=v;best=c;}});
-    if(m.lazy==null||Math.random()<0.01)m.lazy=Math.random()<0.25?0.4:0;
+    if(m.lazy==null||Math.random()<0.01)m.lazy=Math.random()<0.45?0.6:0.15;
     if(best){var dx=best.x-q.x,dy=best.y-q.y;if(Math.abs(dx)>10)dx>0?I.right=1:I.left=1;if(Math.abs(dy)>10)dy>0?I.down=1:I.up=1;
       if(q.cd<=0&&Math.hypot(dx,dy)>260&&Math.random()<0.02)press(i,'a',m);}
-    if(q.cd<=0&&o&&G.sc[1-i]>=2&&Math.hypot(o.x-q.x,o.y-q.y)<110&&Math.random()<0.08){var ex=o.x-q.x,ey=o.y-q.y;I.left=I.right=I.up=I.down=0;if(Math.abs(ex)>8)ex>0?I.right=1:I.left=1;if(Math.abs(ey)>8)ey>0?I.down=1:I.up=1;press(i,'a',m);}
+    if(q.cd<=0&&o&&G.sc[1-i]>=2&&Math.hypot(o.x-q.x,o.y-q.y)<110&&Math.random()<0.03){var ex=o.x-q.x,ey=o.y-q.y;I.left=I.right=I.up=I.down=0;if(Math.abs(ex)>8)ex>0?I.right=1:I.left=1;if(Math.abs(ey)>8)ey>0?I.down=1:I.up=1;press(i,'a',m);}
     if(m.lazy&&Math.random()<m.lazy){I.up=I.down=I.left=I.right=0;}}
   function dash(G,i,dt,m){var I=input[i],q=G.pl[i];I.up=0;I.down=0;input[i].a=0;if(!q||G.out[i])return;var RX=215,near=null,gap=1e9;
     G.obs.forEach(function(o){var ox=o.x-G.dist;if(ox+o.w<RX+30)return;var g2=ox-(RX+70);if(g2<gap){gap=g2;near=o;}});
-    if(!near)return;if(!near.bot)near.bot=[Math.random()<0.1,Math.random()<0.1];if(near.bot[i])return;   /* sometimes Rob.ai misses one */
-    if(near.type==='owl'){if(near.fy<100&&gap<G.speed*0.32)I.down=1;return;}
-    if(q.y===0&&gap<G.speed*(0.16+Math.random()*0.03)&&gap>-20)press(i,'up',m);else input[i].up=0;}
+    if(!near)return;if(!near.bot)near.bot=[Math.random()<0.22,Math.random()<0.22];if(near.bot[i])return;   /* sometimes Rob.ot misses one */
+    if(near.type==='owl'){if(gap<G.speed*0.32)I.down=1;return;}
+    if(q.y===0&&gap<G.speed*(0.13+Math.random()*0.08)&&gap>-20)press(i,'up',m);else input[i].up=0;}
   function step(dt){if(S.screen!=='play'||!S.game||S.game.done)return;
     for(var i=0;i<2;i++){if(!S.players[i].bot)continue;var G=S.game,m=M[i];
       if(S.gameId==='pong')pong(G,i,dt,m);else if(S.gameId==='cycles')cycles(G,i,dt,m);else if(S.gameId==='coins')coins(G,i,dt,m);else dash(G,i,dt,m);}}
@@ -1271,7 +1273,7 @@ function Dash(){var W=800,H=600,SZ=100,RX=215,GR=[262,562],GRAV=2700,JV=940;
   function spawn(){var k=Math.random(),lvl=Math.min(1,G.t/50),o;
     if(k<0.42)o={type:'cactus',w:26+Math.floor(Math.random()*2)*22,h:44+Math.floor(Math.random()*3)*10,fy:0};
     else if(k<0.62)o={type:'tall',w:30,h:88,fy:0};
-    else if(k<0.84&&G.t>6)o={type:'owl',w:44,h:26,fy:[58,128][Math.floor(Math.random()*2)]};   /* low owl: duck; high owl: stay on the ground */
+    else if(k<0.84&&G.t>6)o={type:'owl',w:44,h:26,fy:44+Math.floor(Math.random()*3)*4};   /* owls fly low: duck under them */
     else o={type:'cactus',w:70,h:40,fy:0};
     var pick=function(a){return a[Math.floor(Math.random()*a.length)]};
     if(o.type==='cactus')o.kind=o.w>=70?'copier':o.w>30?pick(['paper','printer','boxes']):pick(['bin','chair']);
@@ -1302,7 +1304,7 @@ function Dash(){var W=800,H=600,SZ=100,RX=215,GR=[262,562],GRAV=2700,JV=940;
       if(G.out[0]&&G.out[1])G.winner=-1;else if(G.out[0])G.winner=1;else if(G.out[1])G.winner=0;
       else G.winner=G.lives[0]>G.lives[1]?0:G.lives[1]>G.lives[0]?1:-1;}};
   function drawObs(ctx,o,x,gy){var y=gy-o.fy-o.h;
-    if(o.type==='owl'){var fl=Math.floor(G.t*8)%2;ctx.fillStyle='#ff3d9a';ctx.fillRect(x+10,y+4,24,20);ctx.fillRect(x+12,y,6,4);ctx.fillRect(x+26,y,6,4);
+    if(o.type==='owl'){var fl=Math.floor(G.t*8)%2;ctx.fillStyle='#ff8a1e';ctx.fillRect(x+10,y+4,24,20);ctx.fillRect(x+12,y,6,4);ctx.fillRect(x+26,y,6,4);
       ctx.fillRect(x,y+(fl?0:12),10,6);ctx.fillRect(x+34,y+(fl?0:12),10,6);ctx.fillStyle='#000';ctx.fillRect(x+15,y+8,5,5);ctx.fillRect(x+24,y+8,5,5);
       ctx.fillStyle='#ffe600';ctx.fillRect(x+20,y+14,4,4);return;}
     officeObj(ctx,o.kind||'bin',x,y,o.w,o.h);}
@@ -1439,7 +1441,7 @@ function drawPreview(c,k,t){c.fillStyle='#050505';c.fillRect(0,0,160,120);c.imag
     drawSprite(c,S.players[0].frames,ax-14,ay-30,30,'walk',t,false);drawSprite(c,S.players[1].frames,bx2-14,by2-30,30,'walk',t,true);}
   else if(k==='dash'){officeWall(c,0,100,160,t*40,COLORS[0]);c.fillStyle=COLORS[0];c.fillRect(0,100,160,2);var cx=((150-(t*90)%200)+200)%200-20;officeObj(c,'bin',cx-3,84,14,16);
     var ph=((t*90)%200)/200,jy=(cx>20&&cx<75)?Math.sin(Math.min(1,(75-cx)/55)*Math.PI)*34:0;drawSprite(c,S.players[0].frames,30,62-jy,40,jy?'idle':'walk',t*2,false);
-    c.fillStyle='#ff3d9a';var ox=((260-(t*120)%260)+260)%260-40;c.fillRect(ox,34,14,9);c.fillRect(ox-5,34+(Math.floor(t*8)%2?0:5),5,3);c.fillRect(ox+14,34+(Math.floor(t*8)%2?0:5),5,3);}
+    c.fillStyle='#ff8a1e';var ox=((260-(t*120)%260)+260)%260-40;c.fillRect(ox,78,14,9);c.fillRect(ox-5,78+(Math.floor(t*8)%2?0:5),5,3);c.fillRect(ox+14,78+(Math.floor(t*8)%2?0:5),5,3);}
   else{c.drawImage(vaultBg(),0,0,160,120);for(i=0;i<5;i++)drawCoin(c,20+i*28,50+(i%2)*25,12,t*3+i);
     drawSprite(c,S.players[0].frames,10+((t*40)%100),70,40,'walk',t,false);}}
 requestAnimationFrame(loop);
