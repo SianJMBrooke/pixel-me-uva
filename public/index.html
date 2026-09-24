@@ -58,6 +58,9 @@
   .spritesm{width:18vmin;height:18vmin}
   .choose{display:flex;flex-direction:column;align-items:stretch;gap:.6vmin;margin:1.2vmin 0;width:min(46vmin,92%)}
   .choose .btn{margin:.4vmin 0;line-height:1.5}
+  .kbd{color:var(--dim);font-size:clamp(7px,1vmin,11px)}
+  .robbtn{border-color:var(--lime)!important;color:var(--lime)!important;outline-color:var(--lime)!important}
+  .cpu{font-size:clamp(14px,2.6vmin,28px);color:var(--pc);border:.4vmin dashed var(--pc);padding:2vmin 2.4vmin;text-align:center;line-height:1.6}
   .browse{display:flex;align-items:center;justify-content:center;gap:1.2vmin;width:100%}
   .browse .spritebig{width:min(30vmin,64%)}
   .arrow{flex:none;width:7vmin;height:12vmin;background:#061015;color:var(--pc);border:.4vmin solid var(--pc);font-size:clamp(16px,3.2vmin,34px);cursor:pointer;box-shadow:0 0 1.4vmin var(--pc)}
@@ -187,6 +190,8 @@
   @keyframes shake{0%,100%{transform:none}25%{transform:translateX(-1.5vmin)}75%{transform:translateX(1.5vmin)}}
   #fsBtn{position:fixed;right:1vmin;top:1vmin;z-index:9;background:transparent;color:var(--dim);border:.3vmin solid #3a4448;font-size:clamp(9px,1.2vmin,13px);padding:.8vmin}
   #soundBtn{position:fixed;top:1vmin;z-index:9;border:.3vmin solid #3a4448;background:#0a0a0a;color:var(--gold);font-size:clamp(10px,1.5vmin,16px);padding:1vmin 1.6vmin}
+  #lbTop{position:fixed;top:1vmin;z-index:9;border:.3vmin solid var(--gold);background:#0a0a0a;color:var(--gold);font-family:inherit;font-size:clamp(9px,1.3vmin,14px);padding:.8vmin 1.4vmin;cursor:pointer;box-shadow:0 0 1.2vmin rgba(255,230,0,.35)}
+  #lbTop:active{background:var(--gold);color:#000}
   #langBtn{position:fixed;left:1vmin;top:1vmin;z-index:9;display:flex;gap:0;border:.3vmin solid #3a4448;background:#0a0a0a;padding:0;font-size:clamp(10px,1.5vmin,16px)}
   #langBtn b{font-weight:normal;padding:1vmin 1.6vmin;color:var(--dim)}
   #langBtn b.on{background:var(--gold);color:#000;box-shadow:0 0 1.4vmin var(--gold)}
@@ -264,6 +269,7 @@
     <div class="ctl" id="introCtl"></div>
     <div class="readyrow"><button class="rbtn" id="rdy0" style="--pc:var(--p0)"></button><button class="rbtn" id="rdy1" style="--pc:var(--p1)"></button></div>
     <div class="auto" id="introAuto"></div>
+    <button class="btn alt" id="introBack" data-i18n="back"></button>
   </div>
 </div>
 <div id="idle" aria-live="polite"></div>
@@ -280,6 +286,7 @@
 <button id="soundBtn" type="button">♪ ON</button>
 <button id="langBtn" type="button"><b data-l="en">EN</b><b data-l="nl">NL</b></button>
 <button id="fsBtn" data-i18n="fullscreen"></button>
+<button id="lbTop" type="button">★ LEADERBOARD</button>
 <video id="cam" playsinline muted autoplay></video>
 
 <script>
@@ -292,12 +299,17 @@ var COLORS=['#ff3cf0','#29e3ff'];
 var FONT='"Press Start 2P", monospace';
 var SP=128,CAP=512,COLS=48;
 /* Digital Interactions Lab members (uva-dilab.com/people) — pre-pixelated 128x128 sprites, packed below */
-var DIL_NAMES=[['Prof. Judith Good','JUDITH'],['Dr Hamed S. Alavi','HAMED'],['Dr Katja Rogers','KATJA'],['Dr Si\u00e2n Brooke','SIAN'],['Prof. Somaya Ben Allouch','SOMAYA'],['Sara Bagheri','SARA'],['Shruti Rao','SHRUTI'],['Maria M\u0142ocka','MARIA'],['Benton Ching','BENTON'],['Merve Deniz Paker','MERVE'],['Ofelya Aliyeva','OFELYA'],['Hans Dekkers','HANS'],['Rachna Mallara','RACHNA'],['Judithoid','JUDITHOID'],['Destroyer the Pomeranian','DESTROYER'],['Mayhem the Pomeranian','MAYHEM']];
-var DIL_FEATS=[[[253,175,133],[138,62,38],[219,220,218],null,0,0,".......0r0w.0q0z.0p11.0o13.0n13.0l14.0l14.0j0q0w16.0j0p0y16.0j0o0z17.0i0n0z17.0i0n0z17.0i0m1117.0i0m1216.0i0m1416.0i0m1416.0h0m1516.0h0m1516.0h0m1519.0h0m1519.0h0m1718.0h0m1718.0h0m1718.0i0m"],[[211,147,125],[38,30,28],[54,51,51],null,[34,28,28],1,"......0r0x.0q10.0o13.0o14.0m14.0l15.0k17.0j17.0i17.0i17.0i0s0w0x1217.0i0o1318.0h0n1318.0h0n1418.0h0n1418.0h0m1418.0h0m1518.0h0m1517.0h0m1517.0h0m.0h0m.0i0m.0j0l.0l0l.0l0m",{"curly":1,"round":1,"trim":1}],[[221,173,159],[228,198,128],[186,169,161],[137,126,119],[67,34,38],0,".......0x0z.0u12.0s14.0r15.0q16.0p17.0o18.0o0q0u18.0n0p0x19.0m0o0y19.0m0n101a.0m0n111a.0l0m111b.0l0m121b.0l0m131b.131c.141c.141c.151c.161c.161d.161d.161d.161d.161d.161e.161e.161e.161f.161f.161f.161f.161f.161f.151f.151f.151f.151f.151f.151f.151f"],[[255,230,214],[230,196,120],[26,24,30],null,[104,44,36],0,"...0x0y11111313.0r13.0r13.0r13.0q13.0q13.0q13.0q13.0r121414.0s11.0s10.0q12.0p13.0o14.0n15.0n15.0m16.0m0o1516.0m0o1516.0m0o1516.0m0o15161818.0l0o1516.0m0o1516.0m0m1717",{"curly":1,"skinX":1,"fringe":1,"lips":[176,44,96],"piercing":1,"tattoo":[36,52,86],"sleeveless":1,"round":1}],[[241,196,188],[137,85,58],[196,36,52],[244,242,238],0,0,".......0w0w.0r11.0p13.0n15.0m17.0l17.0l17.0k18.0j19.0g1f.0g1f.0g0n0p1f.0g0n0q1f.0g0n0s1f.0g0n0t1f.0g0n0v1f.0f0n0y12161e.0f0n161e.0e0n161d.0e0n161d.0e0n161d.0e0n161d.0e0n161d.0e0n161d.0e0n161d.0f0n161e.0f0n161e.0f0n161e.0g0n161f.0g0n161f.0g0n161f.0g0n161f.0g0n161f.0g0n161f.0g0n161f.0f0n161e.0f0n161e.0e0n161d.0f0n161c.0g0n161b.0h0n161a",{"pants":[48,44,56],"thick":1,"sweep":1,"liner":1,"lips":[176,44,96]}],[[238,171,139],[84,46,36],[143,114,145],[224,188,199],0,0,".......0t0z.0r11.0p12.0o13.0o14.0n16.0n16.0m0r0y17.0m0q1118.0l0p1218.0l0p1219.0l0o1319.0l0o1319.0l0n1319.0l0m1419.0l0m1419.0l0m1519.0l0m1519.1619.1619.161a.171a.171b.171b.161c.161d.151e.151f.151g.151g.151g.151g.151g.161g.171g.171g.181g.181g.181g.181g.181g"],[[176,120,84],[26,20,22],[128,82,50],[200,164,116],0,0,"..........0u0y.0r11.0p13.0n15.0m16.0m16.0l17.0k18.0k18.0k18.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0k18.0k18.0l17.0l17.0m0n0p0q0s0t0v0w0y0z11121415.0n0n0p0q0s0t0v0w0y0z11121415",{"curly":1,"skinX":1,"pants":[78,54,40],"thick":1}],[[224,162,116],[74,24,56],[238,236,232],null,0,0,"..........0u0y.0r11.0p13.0n15.0m16.0m16.0l17.0k18.0k18.0k18.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0k18.0k18.0l17.0l17.0m0n0p0q0s0t0v0w0y0z11121415.0n0n0p0q0s0t0v0w0y0z11121415",{"curly":1,"fringe":1,"skinX":1,"thick":1,"shortSleeve":1,"vest":[[150,150,158],[34,34,38]],"shoes":[62,170,84],"pants":[70,64,86]}],[[240,202,168],[26,24,28],[40,60,112],null,[104,44,36],0,".............0s10.0r11.0p13.0o14.0o14.0n0n.0n0n.0m0n1616.0m0n1616.0m0n1616.0m0n1616",{"round":1,"stubble":1,"skinX":1,"buzz":1,"collar":1,"pocket":1}],[[255,238,232],[242,140,186],[62,68,112],null,0,0,"...........0t0z.0r11.0p13.0o14.0o14.0n15.0m16.0m16.0m16.0l0o1517.0l0o1517.0l0o1517.0l0o1517.0l0o1517.0l0o1517.0m0o1516",{"skinX":1,"buzz":1,"lips":[190,58,112],"shadow":[70,120,215]}],[[243,174,127],[28,20,20],[121,29,46],[164,62,93],0,0,"..........0t0z.0q12.0o14.0n15.0m16.0l17.0k18.0j19.0j19.0j19.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0j19.0j19.0k18.0k18.0m0n0p0q0s0t0v0w0y0z111214151717.0m0n0p0q0s0t0v0w0y0z11121415",{"curly":1,"thick":1}],[[233,187,168],[70,56,47],[124,134,153],[77,73,71],0,0,".........0t0y.0s10.0p12.0o13.0n13.0m0w1114.0m0p1215.0m0n1316.0l0n1316.0l0n1316.0m0n1316.0m0n1415.1415.1415"],[[176,120,84],[30,26,30],[34,34,42],[172,206,230],0,0,"..........0t0z.0q12.0p13.0o14.0n15.0m16.0m16.0l17.0l17.0k18.0k18.0k18.0k18.0k18.0k0p1418.0k0p1418.0k0p1418.0k0p1418.0k0p1418.0k0p1418.0k0p1418.0j0p1419.0j0p1419.0j0p1419.0j0p1419.0j0p141a.0k0n1619",{"skinX":1,"collar":1,"earring":1,"part":1,"lips":[168,78,80],"thick":1}],[[253,175,133],[138,62,38],[219,220,218],null,0,0,".......0r0w.0q0z.0p11.0o13.0n13.0l14.0l14.0j0q0w16.0j0p0y16.0j0o0z17.0i0n0z17.0i0n0z17.0i0m1117.0i0m1216.0i0m1416.0i0m1416.0h0m1516.0h0m1516.0h0m1519.0h0m1519.0h0m1718.0h0m1718.0h0m1718.0i0m",{"scooter":1}],[[200,132,62],[36,32,38],[36,32,38],null,0,0,"",{"dog":"destroyer"}],[[222,128,48],[222,128,48],[222,128,48],null,0,0,"",{"dog":"mayhem"}]];
+var DIL_NAMES=[['Prof. Judith Good','JUDITH'],['Dr Hamed S. Alavi','HAMED'],['Dr Katja Rogers','KATJA'],['Dr Si\u00e2n Brooke','SIAN'],['Prof. Somaya Ben Allouch','SOMAYA'],['Sara Bagheri','SARA'],['Shruti Rao','SHRUTI'],['Maria M\u0142ocka','MARIA'],['Benton Ching','BENTON'],['Merve Deniz Paker','MERVE'],['Ofelya Aliyeva','OFELYA'],['Hans Dekkers','HANS'],['Alex Fleck','ALEX'],['Rachna Mallara','RACHNA'],['Judithoid','JUDITHOID'],['Destroyer the Pomeranian','DESTROYER'],['Mayhem the Pomeranian','MAYHEM']];
+var DIL_FEATS=[[[253,175,133],[138,62,38],[219,220,218],null,0,0,".......0r0w.0q0z.0p11.0o13.0n13.0l14.0l14.0j0q0w16.0j0p0y16.0j0o0z17.0i0n0z17.0i0n0z17.0i0m1117.0i0m1216.0i0m1416.0i0m1416.0h0m1516.0h0m1516.0h0m1519.0h0m1519.0h0m1718.0h0m1718.0h0m1718.0i0m"],[[211,147,125],[38,30,28],[54,51,51],null,[34,28,28],1,"......0r0x.0q10.0o13.0o14.0m14.0l15.0k17.0j17.0i17.0i17.0i0s0w0x1217.0i0o1318.0h0n1318.0h0n1418.0h0n1418.0h0m1418.0h0m1518.0h0m1517.0h0m1517.0h0m.0h0m.0i0m.0j0l.0l0l.0l0m",{"curly":1,"round":1,"trim":1}],[[221,173,159],[228,198,128],[186,169,161],[137,126,119],[67,34,38],0,".......0x0z.0u12.0s14.0r15.0q16.0p17.0o18.0o0q0u18.0n0p0x19.0m0o0y19.0m0n101a.0m0n111a.0l0m111b.0l0m121b.0l0m131b.131c.141c.141c.151c.161c.161d.161d.161d.161d.161d.161e.161e.161e.161f.161f.161f.161f.161f.161f.151f.151f.151f.151f.151f.151f.151f"],[[255,230,214],[230,196,120],[26,24,30],null,[104,44,36],0,"...0x0y11111313.0r13.0r13.0r13.0q13.0q13.0q13.0q13.0r121414.0s11.0s10.0q12.0p13.0o14.0n15.0n15.0m16.0m0o1516.0m0o1516.0m0o1516.0m0o15161818.0l0o1516.0m0o1516.0m0m1717",{"curly":1,"skinX":1,"fringe":1,"lips":[176,44,96],"piercing":1,"tattoo":[36,52,86],"sleeveless":1,"round":1}],[[241,196,188],[137,85,58],[196,36,52],[244,242,238],0,0,".......0w0w.0r11.0p13.0n15.0m17.0l17.0l17.0k18.0j19.0g1f.0g1f.0g0n0p1f.0g0n0q1f.0g0n0s1f.0g0n0t1f.0g0n0v1f.0f0n0y12161e.0f0n161e.0e0n161d.0e0n161d.0e0n161d.0e0n161d.0e0n161d.0e0n161d.0e0n161d.0f0n161e.0f0n161e.0f0n161e.0g0n161f.0g0n161f.0g0n161f.0g0n161f.0g0n161f.0g0n161f.0g0n161f.0f0n161e.0f0n161e.0e0n161d.0f0n161c.0g0n161b.0h0n161a",{"pants":[48,44,56],"thick":1,"sweep":1,"liner":1,"lips":[176,44,96]}],[[238,171,139],[84,46,36],[143,114,145],[224,188,199],0,0,".......0t0z.0r11.0p12.0o13.0o14.0n16.0n16.0m0r0y17.0m0q1118.0l0p1218.0l0p1219.0l0o1319.0l0o1319.0l0n1319.0l0m1419.0l0m1419.0l0m1519.0l0m1519.1619.1619.161a.171a.171b.171b.161c.161d.151e.151f.151g.151g.151g.151g.151g.161g.171g.171g.181g.181g.181g.181g.181g"],[[176,120,84],[26,20,22],[128,82,50],[200,164,116],0,0,"..........0u0y.0r11.0p13.0n15.0m16.0m16.0l17.0k18.0k18.0k18.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0k18.0k18.0l17.0l17.0m0n0p0q0s0t0v0w0y0z11121415.0n0n0p0q0s0t0v0w0y0z11121415",{"curly":1,"skinX":1,"pants":[78,54,40],"thick":1}],[[224,162,116],[74,24,56],[238,236,232],null,0,0,"..........0u0y.0r11.0p13.0n15.0m16.0m16.0l17.0k18.0k18.0k18.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0j19.0k18.0k18.0l17.0l17.0m0n0p0q0s0t0v0w0y0z11121415.0n0n0p0q0s0t0v0w0y0z11121415",{"curly":1,"fringe":1,"skinX":1,"thick":1,"shortSleeve":1,"vest":[[150,150,158],[34,34,38]],"shoes":[62,170,84],"pants":[70,64,86]}],[[240,202,168],[26,24,28],[40,60,112],null,[104,44,36],0,".............0s10.0r11.0p13.0o14.0o14.0n0n.0n0n.0m0n1616.0m0n1616.0m0n1616.0m0n1616",{"round":1,"stubble":1,"skinX":1,"buzz":1,"collar":1,"pocket":1}],[[255,238,232],[242,140,186],[62,68,112],null,0,0,"...........0t0z.0r11.0p13.0o14.0o14.0n15.0m16.0m16.0m16.0l0o1517.0l0o1517.0l0o1517.0l0o1517.0l0o1517.0l0o1517.0m0o1516",{"skinX":1,"buzz":1,"lips":[190,58,112],"shadow":[70,120,215]}],[[243,174,127],[28,20,20],[121,29,46],[164,62,93],0,0,"..........0t0z.0q12.0o14.0n15.0m16.0l17.0k18.0j19.0j19.0j19.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0i1a.0j19.0j19.0k18.0k18.0m0n0p0q0s0t0v0w0y0z111214151717.0m0n0p0q0s0t0v0w0y0z11121415",{"curly":1,"thick":1}],[[233,187,168],[70,56,47],[124,134,153],[77,73,71],0,0,".........0t0y.0s10.0p12.0o13.0n13.0m0w1114.0m0p1215.0m0n1316.0l0n1316.0l0n1316.0m0n1316.0m0n1415.1415.1415"],[[240,200,172],[108,72,46],[24,24,28],null,[18,18,22],1,".........0t0y.0s10.0p12.0o13.0n13.0m0w1114.0m0p1215.0m0n1316.0l0n1316.0l0n1316.0m0n1316.0m0n1415.1415.1415",{"shortSleeve":1,"print":"alien","shorts":1,"pants":[66,68,74],"shoes":[40,40,44]}],[[176,120,84],[30,26,30],[34,34,42],[172,206,230],0,0,"..........0t0z.0q12.0p13.0o14.0n15.0m16.0m16.0l17.0l17.0k18.0k18.0k18.0k18.0k18.0k0p1418.0k0p1418.0k0p1418.0k0p1418.0k0p1418.0k0p1418.0k0p1418.0j0p1419.0j0p1419.0j0p1419.0j0p1419.0j0p141a.0k0n1619",{"skinX":1,"collar":1,"earring":1,"part":1,"lips":[168,78,80],"thick":1}],[[253,175,133],[138,62,38],[219,220,218],null,0,0,".......0r0w.0q0z.0p11.0o13.0n13.0l14.0l14.0j0q0w16.0j0p0y16.0j0o0z17.0i0n0z17.0i0n0z17.0i0m1117.0i0m1216.0i0m1416.0i0m1416.0h0m1516.0h0m1516.0h0m1519.0h0m1519.0h0m1718.0h0m1718.0h0m1718.0i0m",{"scooter":1}],[[200,132,62],[36,32,38],[36,32,38],null,0,0,"",{"dog":"destroyer"}],[[222,128,48],[222,128,48],[222,128,48],null,0,0,"",{"dog":"mayhem"}]];
 var DIL=[];
-function loadDil(){DIL=[];DIL_NAMES.forEach(function(nm,k){var f=DIL_FEATS[k];if(f)DIL.push({full:nm[0],short:nm[1],F:(function(o){return {skin:f[0],hair:f[1],top:f[2],accent:f[3],glasses:!!f[4],glassCol:f[4]||[30,30,40],beard:!!f[5],hat:false,hg:f[6]||null,curly:!!o.curly,fringe:!!o.fringe,stubble:!!o.stubble,roundGlasses:!!o.round,skinX:!!o.skinX,buzz:!!o.buzz,lips:o.lips||null,pants:o.pants||null,thick:!!o.thick,shadow:o.shadow||null,piercing:!!o.piercing,tattoo:o.tattoo||null,heavy:!!o.heavy,sleeveless:!!o.sleeveless,collar:!!o.collar,pocket:!!o.pocket,dog:o.dog||null,earring:!!o.earring,part:!!o.part,scooter:!!o.scooter,shortSleeve:!!o.shortSleeve,vest:o.vest||null,shoes:o.shoes||null,trim:!!o.trim,sweep:!!o.sweep,liner:!!o.liner}})(f[7]||{})});});
+function loadDil(){DIL=[];DIL_NAMES.forEach(function(nm,k){var f=DIL_FEATS[k];if(f)DIL.push({full:nm[0],short:nm[1],F:featF(f)});});
+  if(typeof S!=='undefined'&&S.screen==='lobby'){renderPanel(0);renderPanel(1);}}
+function featF(f){return (function(o){return {skin:f[0],hair:f[1],top:f[2],accent:f[3],glasses:!!f[4],glassCol:f[4]||[30,30,40],beard:!!f[5],hat:false,hg:f[6]||null,curly:!!o.curly,fringe:!!o.fringe,stubble:!!o.stubble,roundGlasses:!!o.round,skinX:!!o.skinX,buzz:!!o.buzz,lips:o.lips||null,pants:o.pants||null,thick:!!o.thick,shadow:o.shadow||null,piercing:!!o.piercing,tattoo:o.tattoo||null,heavy:!!o.heavy,sleeveless:!!o.sleeveless,collar:!!o.collar,pocket:!!o.pocket,dog:o.dog||null,earring:!!o.earring,part:!!o.part,scooter:!!o.scooter,shortSleeve:!!o.shortSleeve,vest:o.vest||null,shoes:o.shoes||null,trim:!!o.trim,sweep:!!o.sweep,liner:!!o.liner,shorts:!!o.shorts,print:o.print||null,robot:!!o.robot,mean:!!o.mean}})(f[7]||{});}
+function __unused(){
   if(typeof S!=='undefined'&&S.screen==='lobby'){renderPanel(0);renderPanel(1);}}
 var DIL_BAG=[];
+var ROB_FEAT=function(){return [[242,200,178],[170,168,164],[70,74,84],null,0,1,DIL_FEATS[11][6],{robot:1,skinX:1,mean:1}];};
+function newBot(i){var F=featF(ROB_FEAT()),fr=CARTOON.frames(F);return {i:i,state:'ready',name:'ROB.AI',frames:fr,thumb:makeThumb(fr),count:0,returning:false,note:'',dil:'Rob.ai',bot:true,speed:1};}
 function pickDil(avoid){if(!DIL.length)return null;if(!DIL_BAG.length){DIL_BAG=DIL.map(function(_,i){return i}).sort(function(){return Math.random()-.5});}
   var i=DIL_BAG.pop();if(DIL[i].full===avoid&&DIL.length>1)return pickDil(avoid);return DIL[i];}
 /* ---------- cartoon character builder: photo -> features -> 128x128 cartoon ---------- */
@@ -386,6 +398,8 @@ var CARTOON=(function(){
     rect(33-la,48,37-la,54,pt.lo,4);rect(37-la,48,37-la,54,pt.dk,4);
     rect(26+la,55+lf,31+la,59+lf,bt.b,5);rect(26+la,59+lf,31+la,59+lf,bt.dk,5);P(27+la,56+lf,bt.hi,5);
     rect(33-la,55+rf,38-la,59+rf,bt.lo,5);rect(33-la,59+rf,38-la,59+rf,bt.dk,5);
+    if(F.shorts){rect(27+la,52,31+la,54,sk.b,2);rect(31+la,52,31+la,54,sk.lo,2);rect(33-la,52,37-la,54,sk.lo,2);rect(37-la,52,37-la,54,sk.dk,2);
+      rect(27+la,51,31+la,51,pt.dk,4);rect(33-la,51,37-la,51,pt.dk,4);rect(26+la,55+lf,31+la,55+lf,[236,236,232],5);rect(33-la,55+rf,38-la,55+rf,[214,214,210],5);}
     if(F.shoes){rect(26+la,59+lf,31+la,59+lf,[242,242,238],5);rect(33-la,59+rf,38-la,59+rf,[222,222,218],5);P(28+la,57+lf,[242,242,238],5);P(35-la,57+rf,[222,222,218],5);}}
     /* arms + hands */
     rect(22,36+b,24,44+b,tp.lo,3);rect(22,36+b,22,44+b,tp.b,3);rect(40,36+b,42,44+b,tp.lo,3);rect(42,36+b,42,44+b,tp.dk,3);
@@ -400,11 +414,25 @@ var CARTOON=(function(){
     if(F.sleeveless&&!ac){rect(30,35+b,34,35+b,sk.lo,2);rect(31,36+b,33,36+b,sk.lo,2);P(25,35+b,sk.b,2);P(39,35+b,sk.lo,2);}
     if(F.collar){P(30,35+b,tp.hi,3);P(31,36+b,tp.hi,3);P(34,35+b,tp.hi,3);P(33,36+b,tp.hi,3);P(32,35+b,sk.lo,2);[38,41,44].forEach(function(y){P(32,y+b,tp.hi,3)});}
     if(F.pocket){rect(27,38+b,29,41+b,tp.lo,3);rect(27,38+b,29,38+b,tp.dk,3);P(26,39+b,tp.dk,3);P(30,39+b,tp.dk,3);rect(26,42+b,30,42+b,tp.dk,3);}
+    if(F.print==='alien'){var ag=[118,220,92],agd=[62,150,52],ak=[12,14,16];
+      [[30,34,37],[29,35,38],[28,36,39],[28,36,40],[29,35,41],[30,34,42],[31,33,43]].forEach(function(r){for(var ax=r[0];ax<=r[1];ax++)P(ax,r[2]+b,ax>=34?agd:ag,3);});
+      [[29,39],[30,39],[30,40],[34,39],[35,39],[34,40]].forEach(function(e){P(e[0],e[1]+b,ak,3);});P(32,42+b,agd,3);}
     rect(25,46+b,39,47+b,blt.dk,5);P(32,46+b,[236,196,90],5);P(32,47+b,[190,140,60],5);
     if(F.vest){var v0=tones(F.vest[0]),v1=tones(F.vest[1]);for(Y=35;Y<=47;Y++){var vt=Y>=46?v1:(((Y-35)>>1)%2?v1:v0);
       rect(25,Y+b,39,Y+b,vt.b,3);rect(25,Y+b,26,Y+b,vt.hi,3);rect(38,Y+b,39,Y+b,vt.lo,3);}
       for(Y=35;Y<=39;Y++){var k=Math.max(0,3-(Y-35));for(X=32-k;X<=32+k;X++)P(X,Y+b,tp.b,3);}P(31,35+b,sk.lo,2);P(32,35+b,sk.lo,2);P(33,35+b,sk.lo,2);
       for(X=25;X<=39;X+=2)P(X,47+b,v1.dk,3);}
+    if(F.robot){var mt=tones([158,170,186]),md=tones([84,96,114]),scr=[41,227,255];
+      rect(24,35+b,40,47+b,mt.b,3);rect(24,35+b,25,47+b,mt.hi,3);rect(39,35+b,40,47+b,mt.lo,3);
+      rect(27,37+b,37,44+b,[24,32,44],6);P(28,38+b,[255,70,70],7);P(30,38+b,[255,230,0],7);P(32,38+b,[90,255,120],7);
+      rect(28,40+b,36,40+b,scr,7);rect(28,42+b,33,42+b,scr,7);P(35,42+b,scr,7);
+      [[25,36],[38,36],[25,45],[38,45]].forEach(function(q2){P(q2[0],q2[1]+b,md.dk,3);});
+      rect(24,46+b,40,47+b,md.b,5);rect(31,46+b,33,47+b,[255,230,0],5);
+      rect(21,36+b,23,43+b,md.b,3);rect(21,36+b,21,43+b,md.hi,3);rect(21,39+b,23,39+b,md.dk,3);rect(41,36+b,43,43+b,md.lo,3);rect(43,36+b,43,43+b,md.dk,3);rect(41,39+b,43,39+b,md.dk,3);
+      rect(20,44+b,23,46+b,mt.lo,5);rect(41,44+b,44,46+b,mt.lo,5);
+      rect(27+la,48,31+la,55,md.b,4);rect(27+la,48,27+la,55,md.hi,4);rect(27+la,51,31+la,51,md.dk,4);
+      rect(33-la,48,37-la,55,md.lo,4);rect(37-la,48,37-la,55,md.dk,4);rect(33-la,51,37-la,51,md.dk,4);
+      rect(25+la,56+lf,32+la,59+lf,mt.lo,5);rect(25+la,59+lf,32+la,59+lf,md.dk,5);rect(32-la,56+rf,39-la,59+rf,mt.lo,5);rect(32-la,59+rf,39-la,59+rf,md.dk,5);}
     /* neck, ears, big head */
     rect(30,FT+17+b,34,FT+20+b,sk.lo,2);
     rect(22,FT+8+b,23,FT+11+b,sk.b,2);rect(42,FT+8+b,43,FT+11+b,sk.lo,2);
@@ -421,6 +449,14 @@ var CARTOON=(function(){
     if(F.beard||F.stubble){var bc=hr?hr.b:[60,44,36];for(Y=FT+9;Y<=FT+20;Y++)for(X=22;X<=43;X++){if(!inE(X,Y,32.5,FT+9.5,9.8,10.5))continue;var jaw=F.trim?(Y>=FT+17||(Y===FT+15&&X>=29&&X<=36)||(Y===FT+16&&(X<=31||X>=34))||((X<=24||X>=41)&&Y>=FT+12)):(Y>=FT+14||((X<=25||X>=40)&&Y>=FT+9));if(!jaw)continue;
       if(F.beard)P(X,Y+b,F.trim?((Y>=FT+19||X>=40)?sh(bc,.7):sh(bc,.85)):((Y>=FT+19||X>=40)?sh(bc,.75):bc),1);else if(F.heavy){var hb=hr?hr.b:[40,30,28],mix=[Math.round(hb[0]*.7+sk.lo[0]*.3),Math.round(hb[1]*.7+sk.lo[1]*.3),Math.round(hb[2]*.7+sk.lo[2]*.3)];P(X,Y+b,((X+2*Y)%3===0)?sk.lo:mix,2);}else if((X+Y)%2===0)P(X,Y+b,sh(sk.b,.74),2);}}
     if(AG){var ht=tones(F.hatCol);for(Y=0;Y<FT+8;Y++)for(X=12;X<=52;X++)if(AG[Y*G+X])P(X,Y+b,X<30?ht.hi:(X>36?ht.lo:ht.b),6);}
+    if(F.robot){var md2=tones([84,96,114]);rect(28,FT+19+b,36,FT+20+b,md2.b,5);rect(28,FT+19+b,36,FT+19+b,md2.hi,5);
+      var rod=[176,186,200],rodd=[110,120,136],glow=(leg==='a')?[255,230,0]:[255,70,70];
+      /* two antennae with glowing tips, and metal bolts where the ears are */
+      [[23,0],[22,-1],[22,-2],[21,-3],[21,-4],[20,-5]].forEach(function(q3){P(q3[0],FT+q3[1]+b,rod,5);P(q3[0]+1,FT+q3[1]+b,rodd,5);});
+      [[42,0],[43,-1],[43,-2],[44,-3],[44,-4],[45,-5]].forEach(function(q3){P(q3[0],FT+q3[1]+b,rodd,5);P(q3[0]-1,FT+q3[1]+b,rod,5);});
+      rect(19,FT-8+b,21,FT-6+b,glow,7);P(19,FT-8+b,[255,255,220],7);rect(44,FT-8+b,46,FT-6+b,glow,7);P(44,FT-8+b,[255,255,220],7);
+      rect(20,FT+7+b,23,FT+12+b,rod,5);rect(20,FT+7+b,20,FT+12+b,[220,226,236],5);P(21,FT+9+b,rodd,5);P(21,FT+10+b,rodd,5);
+      rect(42,FT+7+b,45,FT+12+b,rodd,5);rect(45,FT+7+b,45,FT+12+b,[70,78,92],5);P(44,FT+9+b,[60,66,80],5);P(44,FT+10+b,[60,66,80],5);}
     /* eyes, mouth, glasses */
     if(F.shadow){var es=F.shadow,es2=pop(sh(es,1.2),1.05);[[27,29],[35,37]].forEach(function(e){P(e[0],FT+9+b,es,7);P(e[0]+1,FT+9+b,es2,7);P(e[1],FT+9+b,es,7);P(e[0],FT+10+b,es,7);P(e[1],FT+10+b,sh(es,.85),7);});}
     if(F.liner){var ln=[18,12,16];rect(27,FT+9+b,29,FT+9+b,ln,7);P(26,FT+9+b,ln,7);P(25,FT+8+b,ln,7);rect(35,FT+9+b,37,FT+9+b,ln,7);P(38,FT+9+b,ln,7);P(39,FT+8+b,ln,7);}
@@ -437,6 +473,10 @@ var CARTOON=(function(){
     else if(F.glasses){var gc=lum(F.glassCol)>140?sh(F.glassCol,.45):sh(F.glassCol,.9);
       [[25,30],[34,39]].forEach(function(g){for(var X=g[0];X<=g[1];X++){P(X,FT+9+b,gc,8);P(X,FT+13+b,gc,8)}for(var y=FT+10;y<=FT+12;y++){P(g[0],y+b,gc,8);P(g[1],y+b,gc,8)}});
       P(31,FT+10+b,gc,8);P(32,FT+10+b,gc,8);P(33,FT+10+b,gc,8);}
+    if(F.mean){var brow=[52,48,50],red=[235,40,40];   /* angry slanted brows, glowing red eyes, frown */
+      [[25,7],[26,7],[27,8],[28,8],[29,9],[39,7],[38,7],[37,8],[36,8],[35,9]].forEach(function(q4){P(q4[0],FT+q4[1]+b,brow,7);});
+      rect(28,FT+10+b,29,FT+12+b,red,7);rect(35,FT+10+b,36,FT+12+b,red,7);P(28,FT+10+b,[255,200,200],7);P(35,FT+10+b,[255,200,200],7);
+      var mo=[70,30,34];P(30,FT+17+b,mo,7);P(31,FT+16+b,mo,7);P(32,FT+16+b,mo,7);P(33,FT+16+b,mo,7);P(34,FT+16+b,mo,7);P(35,FT+17+b,mo,7);}
     /* inner outlines between regions, then dark outer outline */
     /* mobility scooter (Judithoid) */
     if(F.scooter){var red={hi:[70,96,170],b:[30,50,112],lo:[18,28,72]},chrome=[206,212,222],tyre=[34,30,38],seat=[44,40,50],sp=(leg==='a'?1:0);
@@ -525,24 +565,24 @@ var SEG=null;
 
 var LANG_KEY='pixelme-lang';
 var I18N={
- en:{sub:'Two players · pick a Digital Interactions Lab member or snap a photo · battle!',leaderboard:'LEADERBOARD',topPlayers:'TOP PLAYERS',noGames:'No games yet.<br>Be the first!',
+ en:{sub:'1 or 2 players · pick a Digital Interactions Lab member or snap a photo · battle!',leaderboard:'LEADERBOARD',topPlayers:'TOP PLAYERS',noGames:'No games yet.<br>Be the first!',
   waiting:'WAITING FOR<br>PLAYER {n}…',tapJoin:'TAP TO JOIN',camHint:'Stand in front of the white backdrop<br>and fill the dotted outline',noCam:'No camera found – tap SURPRISE ME for a Digital Interactions Lab member',
   back:'BACK',snap:'SNAP!',surprise:'SURPRISE ME',chooseHow:'HOW DO YOU<br>WANT TO PLAY?',asDil:'PLAY AS A DIGITAL INTERACTIONS LAB MEMBER',fromPhoto:'MAKE ME FROM A PHOTO',chooseHint:'Only the photo option uses the camera',surpriseLab:'Member of the Digital Interactions Lab:',youPixels:'This is you as a pixel hero!',retake:'RETAKE',another:'ANOTHER',playAs:'PLAY AS THEM',keep:'KEEP ME!',
   typeName:'TYPE YOUR NAME',random:'RANDOM',del:'DEL',ok:'OK',nameFirst:'Type a name first',nameTaken:'That name is taken – add a number',ready:'READY!',welcomeBack:'Welcome back – your score continues',
   playingAs:'playing as',letsGo:"LET'S GO!",waitingFor:'Waiting for player {n}…',startAgain:'START AGAIN',chooseTitle:'CHOOSE YOUR <span>GAME</span>',newPlayers:'NEW PLAYERS',
   descPong:'Catch bytes, aim, send them back<br>First to 5 points',descCycles:"Lay wire · don't touch any<br>or get a shock! Best of 3",descCoins:'Collect money to fund your research<br>45 seconds',descDash:'A or up = jump · down = duck<br>Dodge everything! Last runner standing',btnDash:'JUMP',
   holdQuit:'HOLD TO QUIT',btnPong:'SEND',btnCycles:'BOOST',btnCoins:'DASH',draw:"IT'S A DRAW!",wins:'{name} WINS!',totalWins:'total wins',rematch:'REMATCH',otherGame:'OTHER GAME',
-  hallTitle:'HALL OF <span>FAME</span>',howTo:'HOW TO PLAY',p1Ready:'P1 READY',p2Ready:'P2 READY',readyWait:'Both players tap READY (or A) to start',autoStart:'Starting by itself in {n}',idleMsg:'Nobody playing? Back to the start in {n}',zapped:'ZAPPED!',memberOf:'{i} of {n}',inPong:['Each packet carries one byte: 8 bits (lit = 1, dark = 0) that make one letter.','Catch the packet with your port. The letter appears on your computer screen.','Aim with up/down and press A quickly to send the next byte back. Hold it too long and your computer overheats and explodes! Drop or burn a packet and your opponent scores. First to 5.'],bytesSent:'BYTES SENT',packetLost:'PACKET LOST!',pressSend:'PRESS A TO SEND',overheating:'OVERHEATING!',overheated:'KABOOM! OVERHEATED',heat:'HEAT',ctlPong:'Up / down = move and aim · A = send · hold B = move faster',inCycles:['You are laying live wire behind you as you walk.','Touch a wire (yours or theirs) or the wall and you get a shock!','Last one standing wins the round. Best of 3.'],ctlCycles:'D-pad = turn · hold A = walk faster (uses power)',inCoins:['Your research needs funding! Every euro coin is €10K.','Golden grant letters are worth €50K. Dash into the other player to knock €30K of their funding loose.','The best-funded researcher after 45 seconds wins.'],fundingFor:'RESEARCH FUNDING',grantWon:'GRANT!',ctlCoins:'D-pad = move · A = dash',inDash:['Race through the office without tripping over the equipment.','Jump over bins, chairs, printers and filing cabinets. Duck under the owls.','You have 3 lives. Last runner standing wins.'],ctlDash:'A or up = jump · down = duck',lbOnline:'SHARED · LIVE',lbOffline:'OFFLINE · WILL SYNC',lbLocal:'THIS DEVICE ONLY',codeTitle:'ENTER CODE',cancel:'CANCEL',confirmDel:'Delete {name} from the leaderboard?',confirmReset:'Delete ALL scores?',confirmImport:'Merge the imported scores?',wrongCode:'Wrong code',tooMany:'Too many wrong codes. Wait 10 minutes.',noServer:'Can\'t reach the leaderboard. Try again when online.',thName:'NAME',thWins:'WINS',thPlayed:'PLAYED',thPct:'WIN %',export:'EXPORT',import:'IMPORT',resetHold:'RESET ALL',keepHolding:'KEEP HOLDING…',resetDone:'RESET DONE',
+  hallTitle:'HALL OF <span>FAME</span>',howTo:'HOW TO PLAY',twoP:'2 PLAYERS',vsRob:'1 PLAYER: VS ROB.AI',orLbl:'or',botHint:'Computer player',removeRob:'REMOVE ROB.AI',cpu:'COMPUTER',p1Ready:'P1 READY',p2Ready:'P2 READY',readyWait:'Both players tap READY (or A) to start',autoStart:'Starting by itself in {n}',idleMsg:'Nobody playing? Back to the start in {n}',zapped:'ZAPPED!',memberOf:'{i} of {n}',inPong:['Each packet carries one byte: 8 bits (lit = 1, dark = 0) that make one letter.','Catch the packet with your port. The letter appears on your computer screen.','Aim with up/down and press A quickly to send the next byte back. Hold it too long and your computer overheats and explodes! Drop or burn a packet and your opponent scores. First to 5.'],bytesSent:'BYTES SENT',packetLost:'PACKET LOST!',pressSend:'PRESS A TO SEND',overheating:'OVERHEATING!',overheated:'KABOOM! OVERHEATED',heat:'HEAT',ctlPong:'Up / down = move and aim · A = send · hold B = move faster',inCycles:['You are laying live wire behind you as you walk.','Touch a wire (yours or theirs) or the wall and you get a shock!','Last one standing wins the round. Best of 3.'],ctlCycles:'D-pad = turn · hold A = walk faster (uses power)',inCoins:['Your research needs funding! Every euro coin is €10K.','Golden grant letters are worth €50K. Dash into the other player to knock €30K of their funding loose.','The best-funded researcher after 45 seconds wins.'],fundingFor:'RESEARCH FUNDING',grantWon:'GRANT!',ctlCoins:'D-pad = move · A = dash',inDash:['Race through the office without tripping over the equipment.','Jump over bins, chairs, printers and filing cabinets. Duck under the owls.','You have 3 lives. Last runner standing wins.'],ctlDash:'A or up = jump · down = duck',lbOnline:'SHARED · LIVE',lbOffline:'OFFLINE · WILL SYNC',lbLocal:'THIS DEVICE ONLY',codeTitle:'ENTER CODE',cancel:'CANCEL',confirmDel:'Delete {name} from the leaderboard?',confirmReset:'Delete ALL scores?',confirmImport:'Merge the imported scores?',wrongCode:'Wrong code',tooMany:'Too many wrong codes. Wait 10 minutes.',noServer:'Can\'t reach the leaderboard. Try again when online.',thName:'NAME',thWins:'WINS',thPlayed:'PLAYED',thPct:'WIN %',export:'EXPORT',import:'IMPORT',resetHold:'RESET ALL',keepHolding:'KEEP HOLDING…',resetDone:'RESET DONE',
   noPlayed:'No games played yet',badFile:'That file is not a leaderboard export',fullscreen:'FULLSCREEN',
   cReady:'READY',cGo:'GO!',round:'ROUND {n}',takesIt:'{name} TAKES IT',dblCrash:'DOUBLE SHOCK!',cDraw:'DRAW!',cWins:'{name} WINS!'},
- nl:{sub:'Twee spelers · kies een lid van het Digital Interactions Lab of maak een foto · strijd!',leaderboard:'RANGLIJST',topPlayers:'TOPSPELERS',noGames:'Nog geen spellen.<br>Wees de eerste!',
+ nl:{sub:'1 of 2 spelers · kies een lid van het Digital Interactions Lab of maak een foto · strijd!',leaderboard:'LEADERBOARD',topPlayers:'TOPSPELERS',noGames:'Nog geen spellen.<br>Wees de eerste!',
   waiting:'WACHTEN OP<br>SPELER {n}…',tapJoin:'TIK OM MEE TE DOEN',camHint:'Ga voor de witte achtergrond staan<br>en vul de stippellijn',noCam:'Geen camera gevonden – tik op VERRAS ME voor een lid van het Digital Interactions Lab',
   back:'TERUG',snap:'KLIK!',surprise:'VERRAS ME',chooseHow:'HOE WIL JE<br>SPELEN?',asDil:'SPEEL ALS LID VAN HET DIGITAL INTERACTIONS LAB',fromPhoto:'MAAK MIJ VAN EEN FOTO',chooseHint:'Alleen de foto-optie gebruikt de camera',surpriseLab:'Lid van het Digital Interactions Lab:',youPixels:'Dit ben jij als pixelheld!',retake:'OPNIEUW',another:'NOG EEN',playAs:'SPEEL ALS DEZE',keep:'HOUDEN!',
   typeName:'TYP JE NAAM',random:'GOK',del:'WIS',ok:'OK',nameFirst:'Typ eerst een naam',nameTaken:'Die naam is bezet – voeg een cijfer toe',ready:'KLAAR!',welcomeBack:'Welkom terug – je score telt door',
   playingAs:'speelt als',letsGo:'DAAR GAAN WE!',waitingFor:'Wachten op speler {n}…',startAgain:'OPNIEUW BEGINNEN',chooseTitle:'KIES JE <span>SPEL</span>',newPlayers:'NIEUWE SPELERS',
   descPong:'Vang bytes, mik, stuur terug<br>Wie het eerst 5 punten heeft',descCycles:'Leg draad · raak er geen<br>of krijg een schok! Beste van 3',descCoins:'Verzamel geld voor je onderzoek<br>45 seconden',descDash:'A of omhoog = springen · omlaag = bukken<br>Ontwijk alles! Wie het langst rent wint',btnDash:'SPRING',
   holdQuit:'HOUD VAST OM TE STOPPEN',btnPong:'STUUR',btnCycles:'BOOST',btnCoins:'SPRINT',draw:'GELIJKSPEL!',wins:'{name} WINT!',totalWins:'overwinningen',rematch:'REVANCHE',otherGame:'ANDER SPEL',
-  hallTitle:'ERE<span>GALERIJ</span>',howTo:'ZO SPEEL JE',p1Ready:'P1 KLAAR',p2Ready:'P2 KLAAR',readyWait:'Beide spelers tikken op KLAAR (of A) om te starten',autoStart:'Start vanzelf over {n}',idleMsg:'Niemand aan het spelen? Terug naar start over {n}',zapped:'GESCHOKT!',memberOf:'{i} van {n}',inPong:['Elk pakketje draagt één byte: 8 bits (aan = 1, uit = 0) die samen één letter vormen.','Vang het pakketje met je poort. De letter verschijnt op je computerscherm.','Mik met omhoog/omlaag en druk snel op A om de volgende byte terug te sturen. Houd je hem te lang vast, dan raakt je computer oververhit en ontploft hij! Laat je een pakketje vallen of verbrand je het, dan scoort de ander. Wie het eerst 5 heeft wint.'],bytesSent:'BYTES VERSTUURD',packetLost:'PAKKET KWIJT!',pressSend:'DRUK A OM TE STUREN',overheating:'OVERVERHIT!',overheated:'KABOEM! OVERVERHIT',heat:'HITTE',ctlPong:'Omhoog / omlaag = bewegen en mikken · A = versturen · B ingedrukt = sneller',inCycles:['Je legt een stroomdraad achter je neer terwijl je loopt.','Raak je een draad (van jezelf of de ander) of de muur, dan krijg je een schok!','Wie overblijft wint de ronde. Beste van 3.'],ctlCycles:'Pijltjes = draaien · A ingedrukt = sneller lopen (kost energie)',inCoins:['Je onderzoek heeft geld nodig! Elke euromunt is €10K.','Gouden subsidiebrieven zijn €50K waard. Sprint tegen de ander aan om €30K van hun geld los te slaan.','Wie na 45 seconden het meeste onderzoeksgeld heeft wint.'],fundingFor:'ONDERZOEKSGELD',grantWon:'SUBSIDIE!',ctlCoins:'Pijltjes = bewegen · A = sprinten',inDash:['Ren door het kantoor zonder over de spullen te struikelen.','Spring over prullenbakken, stoelen, printers en archiefkasten. Buk voor de uilen.','Je hebt 3 levens. Wie het langst blijft rennen wint.'],ctlDash:'A of omhoog = springen · omlaag = bukken',lbOnline:'GEDEELD · LIVE',lbOffline:'OFFLINE · SYNCT LATER',lbLocal:'ALLEEN DIT APPARAAT',codeTitle:'VOER CODE IN',cancel:'ANNULEREN',confirmDel:'{name} van de ranglijst verwijderen?',confirmReset:'ALLE scores wissen?',confirmImport:'Geïmporteerde scores samenvoegen?',wrongCode:'Verkeerde code',tooMany:'Te vaak een verkeerde code. Wacht 10 minuten.',noServer:'Ranglijst niet bereikbaar. Probeer het later opnieuw.',thName:'NAAM',thWins:'GEWONNEN',thPlayed:'GESPEELD',thPct:'WIN %',export:'EXPORTEREN',import:'IMPORTEREN',resetHold:'ALLES WISSEN',keepHolding:'BLIJF VASTHOUDEN…',resetDone:'GEWIST',
+  hallTitle:'HALL OF <span>FAME</span>',howTo:'ZO SPEEL JE',twoP:'2 SPELERS',vsRob:'1 SPELER: TEGEN ROB.AI',orLbl:'of',botHint:'Computerspeler',removeRob:'ROB.AI WEGHALEN',cpu:'COMPUTER',p1Ready:'P1 KLAAR',p2Ready:'P2 KLAAR',readyWait:'Beide spelers tikken op KLAAR (of A) om te starten',autoStart:'Start vanzelf over {n}',idleMsg:'Niemand aan het spelen? Terug naar start over {n}',zapped:'GESCHOKT!',memberOf:'{i} van {n}',inPong:['Elk pakketje draagt één byte: 8 bits (aan = 1, uit = 0) die samen één letter vormen.','Vang het pakketje met je poort. De letter verschijnt op je computerscherm.','Mik met omhoog/omlaag en druk snel op A om de volgende byte terug te sturen. Houd je hem te lang vast, dan raakt je computer oververhit en ontploft hij! Laat je een pakketje vallen of verbrand je het, dan scoort de ander. Wie het eerst 5 heeft wint.'],bytesSent:'BYTES VERSTUURD',packetLost:'PAKKET KWIJT!',pressSend:'DRUK A OM TE STUREN',overheating:'OVERVERHIT!',overheated:'KABOEM! OVERVERHIT',heat:'HITTE',ctlPong:'Omhoog / omlaag = bewegen en mikken · A = versturen · B ingedrukt = sneller',inCycles:['Je legt een stroomdraad achter je neer terwijl je loopt.','Raak je een draad (van jezelf of de ander) of de muur, dan krijg je een schok!','Wie overblijft wint de ronde. Beste van 3.'],ctlCycles:'Pijltjes = draaien · A ingedrukt = sneller lopen (kost energie)',inCoins:['Je onderzoek heeft geld nodig! Elke euromunt is €10K.','Gouden subsidiebrieven zijn €50K waard. Sprint tegen de ander aan om €30K van hun geld los te slaan.','Wie na 45 seconden het meeste onderzoeksgeld heeft wint.'],fundingFor:'ONDERZOEKSGELD',grantWon:'SUBSIDIE!',ctlCoins:'Pijltjes = bewegen · A = sprinten',inDash:['Ren door het kantoor zonder over de spullen te struikelen.','Spring over prullenbakken, stoelen, printers en archiefkasten. Buk voor de uilen.','Je hebt 3 levens. Wie het langst blijft rennen wint.'],ctlDash:'A of omhoog = springen · omlaag = bukken',lbOnline:'GEDEELD · LIVE',lbOffline:'OFFLINE · SYNCT LATER',lbLocal:'ALLEEN DIT APPARAAT',codeTitle:'VOER CODE IN',cancel:'ANNULEREN',confirmDel:'{name} van de ranglijst verwijderen?',confirmReset:'ALLE scores wissen?',confirmImport:'Geïmporteerde scores samenvoegen?',wrongCode:'Verkeerde code',tooMany:'Te vaak een verkeerde code. Wacht 10 minuten.',noServer:'Ranglijst niet bereikbaar. Probeer het later opnieuw.',thName:'NAAM',thWins:'GEWONNEN',thPlayed:'GESPEELD',thPct:'WIN %',export:'EXPORTEREN',import:'IMPORTEREN',resetHold:'ALLES WISSEN',keepHolding:'BLIJF VASTHOUDEN…',resetDone:'GEWIST',
   noPlayed:'Nog geen spellen gespeeld',badFile:'Dit bestand is geen ranglijst-export',fullscreen:'VOLLEDIG SCHERM',
   cReady:'KLAAR',cGo:'START!',round:'RONDE {n}',takesIt:'{name} WINT DE RONDE',dblCrash:'DUBBELE SCHOK!',cDraw:'GELIJK!',cWins:'{name} WINT!'}};
 var LANG='en';try{LANG=localStorage.getItem(LANG_KEY)||'en'}catch(e){}
@@ -647,7 +687,7 @@ function newPlayer(i){return {i:i,state:'waiting',name:'',frames:null,thumb:'',c
 var S={screen:'lobby',players:[newPlayer(0),newPlayer(1)],gameId:null,game:null,endAt:0,lastTouch:performance.now()};
 var input=[{up:0,down:0,left:0,right:0,a:0,b:0},{up:0,down:0,left:0,right:0,a:0,b:0}];
 
-function show(id){S.lastTouch=performance.now();['lobby','select','play','result','board'].forEach(function(s){$('#'+s).classList.toggle('on',s===id)});S.screen=id;if(actx)musicFor(id);
+function show(id){S.lastTouch=performance.now();var lt=document.getElementById('lbTop');if(lt)lt.hidden=(id==='board'||id==='play');['lobby','select','play','result','board'].forEach(function(s){$('#'+s).classList.toggle('on',s===id)});S.screen=id;if(actx)musicFor(id);
   if(id==='lobby'){renderPanel(0);renderPanel(1);renderMiniBoard();}
   if(id==='board'){renderBoard();lbStatus(LB_STATE);lbSync();}
   if(id==='select')renderSelect();}
@@ -842,7 +882,10 @@ function renderBoard(){var rows=lbSorted(),h='';rows.forEach(function(e,i){var g
 var KB=['1234567890','QWERTYUIOP','ASDFGHJKL','ZXCVBNM'];
 var FUN=['BLIP','ZAP','NOVA','PIXEL','BYTE','COMET','TURBO','RETRO','GLITCH','MEGA','FIZZ','ROCKET'];
 function renderPanel(i){var p=S.players[i],el=$('#panel'+i),h='<div class="ptag">P'+(i+1)+'</div>',other=S.players[1-i];
-  if(p.state==='waiting'){h+='<div class="bigmsg blink">'+T('waiting',{n:i+1})+'</div><button class="btn big" data-act="join">'+T('tapJoin')+'</button>';}
+  if(p.state==='waiting'){h+='<div class="bigmsg blink">'+T('waiting',{n:i+1})+'</div><div class="hint">'+T('twoP')+'</div><button class="btn big" data-act="join">'+T('tapJoin')+'</button>'+
+    (other.bot?'':'<div class="hint">'+T('orLbl')+'</div><button class="btn alt robbtn" data-act="bot">'+T('vsRob')+'</button>');}
+  else if(p.bot){h+='<canvas class="spritebig" width="256" height="256"></canvas><div class="namebox">ROB.AI</div><div class="ready">'+T('ready')+'</div><div class="hint">'+T('botHint')+'</div>'+
+    '<div class="hint blink">'+(other.state==='ready'?T('letsGo'):T('waitingFor',{n:2-i}))+'</div><button class="btn alt" data-act="cancel">'+T('removeRob')+'</button>';}
   else if(p.state==='choose'){h+='<div class="bigmsg">'+T('chooseHow')+'</div><div class="choose"><button class="btn big" data-act="dil">'+T('asDil')+'</button><button class="btn big alt" data-act="photo">'+T('fromPhoto')+'</button></div>'+
     '<div class="hint">'+T('chooseHint')+'</div><div class="row"><button class="btn alt" data-act="cancel">'+T('back')+'</button></div>';}
   else if(p.state==='camera'){h+='<div class="camwrap"><canvas class="preview" width="320" height="320"></canvas><div class="guide"></div><div class="count">'+(p.count||'')+'</div><div class="flash"></div></div>'+
@@ -866,6 +909,8 @@ function camIdle(){if(!camReady||S.players.some(function(q){return q.state==='ca
 function dilIndex(m){for(var k=0;k<DIL.length;k++)if(DIL[k]===m)return k;return 0;}
 function setDil(p,m){p.dilIdx=dilIndex(m);p.speed=m.F.scooter?2:1;p.frames=CARTOON.frames(m.F);p.thumb=makeThumb(p.frames);p.dil=m.full;p.dilShort=m.short;p.name='';}
 function act(i,a,k){var p=S.players[i];SFX.blip();
+  if(a==='bot'){if(S.players[1-i].bot)return;S.players[i]=newBot(i);renderPanel(i);renderPanel(1-i);var o2=S.players[1-i];
+    if(o2.state==='ready')setTimeout(function(){if(S.players[0].state==='ready'&&S.players[1].state==='ready'&&S.screen==='lobby'){SFX.select();show('select');}},1400);return;}
   if(a==='join'){if(DIL.length){p.state='choose';renderPanel(i);}else{p.state='camera';renderPanel(i);ensureCamera().then(function(){renderPanel(i)});}}
   else if(a==='photo'){p.state='camera';renderPanel(i);ensureCamera().then(function(){renderPanel(i)});}
   else if(a==='dil'){var md=pickDil();if(!md)return;setDil(p,md);p.state='review';renderPanel(i);}
@@ -905,7 +950,7 @@ function renderSelect(){[0,1].forEach(function(i){$('#selNm'+i).textContent=S.pl
 $('#cards').addEventListener('click',function(e){var c=e.target.closest('.card');if(c)showIntro(c.dataset.g);});
 var INTRO={id:null,rdy:[false,false],t0:0,AUTO:15};
 var INTRO_KEYS={pong:['inPong','ctlPong'],cycles:['inCycles','ctlCycles'],coins:['inCoins','ctlCoins'],dash:['inDash','ctlDash']};
-function showIntro(id){INTRO.id=id;INTRO.rdy=[false,false];INTRO.t0=performance.now();SFX.select();
+function showIntro(id){INTRO.id=id;INTRO.rdy=[!!S.players[0].bot,!!S.players[1].bot];INTRO.t0=performance.now();SFX.select();
   $('#introTitle').textContent=GAMES[id].name;
   var li='';(T(INTRO_KEYS[id][0])||[]).forEach(function(x){li+='<li>'+esc(x)+'</li>'});$('#introList').innerHTML=li;
   $('#introCtl').textContent=T(INTRO_KEYS[id][1]);renderIntro();$('#intro').classList.add('on');}
@@ -916,12 +961,14 @@ function introTick(now,t){if(!INTRO.id)return;var left=Math.ceil(INTRO.AUTO-(now
   [0,1].forEach(function(i){if(input[i].a&&!INTRO.rdy[i]){INTRO.rdy[i]=true;SFX.blip();renderIntro();}});
   if((INTRO.rdy[0]&&INTRO.rdy[1])||left<=0)closeIntro(true);}
 function closeIntro(go){var id=INTRO.id;INTRO.id=null;$('#intro').classList.remove('on');if(go&&id)startGame(id);}
+$('#introBack').addEventListener('click',function(){SFX.blip();closeIntro(false);});
 [0,1].forEach(function(i){$('#rdy'+i).addEventListener('click',function(){if(!INTRO.id)return;INTRO.rdy[i]=true;SFX.blip();renderIntro();});});
 function startGame(id){S.gameId=id;S.game=GAMES[id].make();S.endAt=0;S.recorded=false;SFX.start();buildPads();show('play');}
 
 /* ---------- touch controls ---------- */
-function buildPads(){[0,1].forEach(function(i){var p=S.players[i],el=$('#pad'+i);input[i]={up:0,down:0,left:0,right:0,a:0,b:0};
-  el.innerHTML='<div class="pn">P'+(i+1)+'<br>'+esc(p.name)+'</div><div class="dpad"><i class="u"></i><i class="l"></i><i class="c"></i><i class="r"></i><i class="d"></i></div>'+
+function buildPads(){BOT.reset();[0,1].forEach(function(i){var p=S.players[i],el=$('#pad'+i);input[i]={up:0,down:0,left:0,right:0,a:0,b:0};
+  if(p.bot){el.innerHTML='<div class="pn">P'+(i+1)+'<br>ROB.AI</div><div class="cpu">'+T('cpu')+'</div>';return;}
+  el.innerHTML='<div class="pn">P'+(i+1)+'<br>'+esc(p.name)+'<br><span class="kbd">'+(i?'⌨ I J K L · U=A · O=B':'⌨ ← ↑ → ↓ · A · B')+'</span></div><div class="dpad"><i class="u"></i><i class="l"></i><i class="c"></i><i class="r"></i><i class="d"></i></div>'+
     '<div class="abtns"><button class="abtn b" data-b="b">B</button><button class="abtn" data-b="a">A<span class="lab">'+T(GAMES[S.gameId].btn)+'</span></button></div>';
   bindDpad(el.querySelector('.dpad'),i);el.querySelectorAll('.abtn').forEach(function(b){bindBtn(b,i,b.dataset.b)});});}
 function relabelPads(){document.querySelectorAll('.abtn .lab').forEach(function(l){l.textContent=T(GAMES[S.gameId].btn)});}
@@ -938,15 +985,56 @@ function bindDpad(el,i){var act=new Map();
 function bindBtn(el,i,k){var ids=new Set();var set=function(){input[i][k]=ids.size?1:0;el.classList.toggle('on',!!ids.size);};
   el.addEventListener('pointerdown',function(e){e.preventDefault();try{el.setPointerCapture(e.pointerId)}catch(_){}ids.add(e.pointerId);set();});
   var end=function(e){ids.delete(e.pointerId);set();};el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end);el.addEventListener('lostpointercapture',end);}
-/* keyboard fallback for testing only */
-var KEYS={KeyW:[0,'up'],KeyS:[0,'down'],KeyA:[0,'left'],KeyD:[0,'right'],KeyF:[0,'a'],KeyG:[0,'b'],ArrowUp:[1,'up'],ArrowDown:[1,'down'],ArrowLeft:[1,'left'],ArrowRight:[1,'right'],KeyK:[1,'a'],KeyL:[1,'b']};
-addEventListener('keydown',function(e){var m=KEYS[e.code];if(m)input[m[0]][m[1]]=1;});addEventListener('keyup',function(e){var m=KEYS[e.code];if(m)input[m[0]][m[1]]=0;});
+/* keyboard: P1 = arrow keys + A and B keys (same as the on-screen A/B buttons); P2 = I J K L + U (A) and O (B) */
+var KEYS={ArrowUp:[0,'up'],ArrowDown:[0,'down'],ArrowLeft:[0,'left'],ArrowRight:[0,'right'],KeyA:[0,'a'],KeyB:[0,'b'],Space:[0,'a'],
+  KeyI:[1,'up'],KeyK:[1,'down'],KeyJ:[1,'left'],KeyL:[1,'right'],KeyU:[1,'a'],KeyO:[1,'b']};
+var PADCLS={up:'.u',down:'.d',left:'.l',right:'.r'};
+function keyLight(i,k,on){var el=document.getElementById('pad'+i);if(!el)return;var t=k==='a'||k==='b'?el.querySelector('.abtn[data-b="'+k+'"]'):el.querySelector('.dpad '+PADCLS[k]);if(t)t.classList.toggle('on',on);}
+addEventListener('keydown',function(e){var m=KEYS[e.code];if(!m||$('#codeDlg').classList.contains('on'))return;if(S.players[m[0]]&&S.players[m[0]].bot)return;
+  input[m[0]][m[1]]=1;keyLight(m[0],m[1],true);if(S.screen==='play'||e.code.indexOf('Arrow')===0||e.code==='Space')e.preventDefault();});
+addEventListener('keyup',function(e){var m=KEYS[e.code];if(!m)return;if(S.players[m[0]]&&S.players[m[0]].bot)return;input[m[0]][m[1]]=0;keyLight(m[0],m[1],false);});
 
 /* hold to quit */
 (function(){var b=$('#btnQuit'),bar=b.querySelector('.bar'),t0=0,raf=0;
   function tick(){var p=(performance.now()-t0)/1200;bar.style.width=Math.min(100,p*100)+'%';if(p>=1){stop();S.game=null;show('select');return;}raf=requestAnimationFrame(tick);}
   function stop(){cancelAnimationFrame(raf);t0=0;bar.style.width='0';}
   b.addEventListener('pointerdown',function(e){e.preventDefault();t0=performance.now();tick();});['pointerup','pointercancel','pointerleave'].forEach(function(ev){b.addEventListener(ev,stop)});})();
+
+/* ---------- Rob.ai: computer opponent ---------- */
+var BOT=(function(){var M=[{},{}];
+  function reset(){M=[{},{}];}
+  function press(i,k,m){var key='_'+k;if(m[key]){input[i][k]=0;m[key]=0;return;}input[i][k]=1;m[key]=1;}   /* one-frame tap, so edge detection sees it */
+  function pong(G,i,dt,m){var I=input[i],px=i===0?46:754,b=G.ball;I.up=I.down=I.left=I.right=0;I.b=0;var target=300;
+    if(G.held===i){if(m.aim==null){m.aim=90+Math.random()*420;m.wait=0.35+Math.random()*0.8;}target=m.aim;m.wait-=dt;if(m.wait<=0&&G.wait<=0){press(i,'a',m);m.aim=null;}else input[i].a=0;}
+    else{m.aim=null;input[i].a=0;var toward=i===0?b.vx<0:b.vx>0;
+      if(toward&&G.held<0){if(m.errFor!==G.sent){m.errFor=G.sent;m.err=(Math.random()*2-1)*(40+Math.min(40,G.sent*2));}
+        var tx=Math.abs((px-b.x)/(b.vx||1)),y=b.y+b.vy*tx,lo=28,hi=572;for(var k=0;k<6&&(y<lo||y>hi);k++){if(y<lo)y=2*lo-y;if(y>hi)y=2*hi-y;}target=y+m.err;}
+      else target=300;}
+    var dy=target-G.y[i];if(dy>14)I.down=1;else if(dy<-14)I.up=1;}
+  function free(G,x,y){return x>=0&&y>=0&&x<80&&y<60&&!G.grid[y*80+x];}
+  function space(G,x,y,lim){if(!free(G,x,y))return 0;var seen={},st=[[x,y]],n=0;seen[y*80+x]=1;
+    while(st.length&&n<lim){var c=st.pop();n++;[[1,0],[-1,0],[0,1],[0,-1]].forEach(function(v){var nx=c[0]+v[0],ny=c[1]+v[1],k=ny*80+nx;if(!seen[k]&&free(G,nx,ny)){seen[k]=1;st.push([nx,ny]);}});}return n;}
+  function cycles(G,i,dt,m){var I=input[i],q=G.pl[i];I.up=I.down=I.left=I.right=0;I.a=0;if(!q||!q.alive)return;
+    var d=q.nd||q.d,opts=[d,[d[1],-d[0]],[-d[1],d[0]]],best=null,bs=-1;
+    opts.forEach(function(o,k){var sc=space(G,q.x+o[0],q.y+o[1],160);if(k===0)sc+=6;if(k>0&&Math.random()<0.02)sc+=10;if(sc>bs){bs=sc;best=o;}});
+    if(best){if(best[0]===1)I.right=1;else if(best[0]===-1)I.left=1;else if(best[1]===1)I.down=1;else I.up=1;}
+    var run=0,x=q.x,y=q.y;while(run<20&&free(G,x+d[0],y+d[1])){x+=d[0];y+=d[1];run++;}I.a=(run>=18&&q.boost>0.5&&Math.random()<0.5)?1:0;}
+  function coins(G,i,dt,m){var I=input[i],q=G.pl[i],o=G.pl[1-i];I.up=I.down=I.left=I.right=0;input[i].a=0;if(!q)return;
+    var best=null,bv=-1;G.coins.forEach(function(c){var dd=Math.hypot(c.x-q.x,c.y-q.y)+40,v=(c.grant?5:1)/dd;if(v>bv){bv=v;best=c;}});
+    if(m.lazy==null||Math.random()<0.01)m.lazy=Math.random()<0.25?0.4:0;
+    if(best){var dx=best.x-q.x,dy=best.y-q.y;if(Math.abs(dx)>10)dx>0?I.right=1:I.left=1;if(Math.abs(dy)>10)dy>0?I.down=1:I.up=1;
+      if(q.cd<=0&&Math.hypot(dx,dy)>260&&Math.random()<0.02)press(i,'a',m);}
+    if(q.cd<=0&&o&&G.sc[1-i]>=2&&Math.hypot(o.x-q.x,o.y-q.y)<110&&Math.random()<0.08){var ex=o.x-q.x,ey=o.y-q.y;I.left=I.right=I.up=I.down=0;if(Math.abs(ex)>8)ex>0?I.right=1:I.left=1;if(Math.abs(ey)>8)ey>0?I.down=1:I.up=1;press(i,'a',m);}
+    if(m.lazy&&Math.random()<m.lazy){I.up=I.down=I.left=I.right=0;}}
+  function dash(G,i,dt,m){var I=input[i],q=G.pl[i];I.up=0;I.down=0;input[i].a=0;if(!q||G.out[i])return;var RX=215,near=null,gap=1e9;
+    G.obs.forEach(function(o){var ox=o.x-G.dist;if(ox+o.w<RX+30)return;var g2=ox-(RX+70);if(g2<gap){gap=g2;near=o;}});
+    if(!near)return;if(!near.bot)near.bot=[Math.random()<0.1,Math.random()<0.1];if(near.bot[i])return;   /* sometimes Rob.ai misses one */
+    if(near.type==='owl'){if(near.fy<100&&gap<G.speed*0.32)I.down=1;return;}
+    if(q.y===0&&gap<G.speed*(0.16+Math.random()*0.03)&&gap>-20)press(i,'up',m);else input[i].up=0;}
+  function step(dt){if(S.screen!=='play'||!S.game||S.game.done)return;
+    for(var i=0;i<2;i++){if(!S.players[i].bot)continue;var G=S.game,m=M[i];
+      if(S.gameId==='pong')pong(G,i,dt,m);else if(S.gameId==='cycles')cycles(G,i,dt,m);else if(S.gameId==='coins')coins(G,i,dt,m);else dash(G,i,dt,m);}}
+  return {step:step,reset:reset};})();
 
 /* ---------- shared canvas helpers ---------- */
 var gc=$('#game'),g=gc.getContext('2d');
@@ -1262,6 +1350,10 @@ function newPlayers(){S.players=[newPlayer(0),newPlayer(1)];S.game=null;show('lo
 $('#btnNewPlayers').onclick=newPlayers;$('#btnNew2').onclick=newPlayers;
 $('#btnBoard').onclick=function(){S.boardBack='lobby';show('board')};$('#btnBoard2').onclick=function(){S.boardBack='result';show('board')};
 $('#btnBack').onclick=function(){show(S.boardBack||'lobby')};
+/* leaderboard button in the top bar, reachable from every screen (leaving a game in progress returns to the game menu afterwards) */
+(function(){var b=$('#lbTop'),fs=$('#fsBtn');function place(){b.style.right=(innerWidth-fs.getBoundingClientRect().left+8)+'px';}place();addEventListener('resize',place);setTimeout(place,500);
+  b.addEventListener('click',function(e){e.stopPropagation();SFX.blip();if(INTRO.id)closeIntro(false);
+    var from=S.screen;if(from==='play'){S.game=null;from='select';}S.boardBack=from;show('board');});})();
 
 /* ---------- admin: export / import / reset ---------- */
 $('#btnExport').onclick=function(){var b=new Blob([JSON.stringify(lbLoad(),null,1)],{type:'application/json'});var a=document.createElement('a');
@@ -1320,7 +1412,7 @@ function loop(now){var t=now/1000,dt=Math.min(0.05,(now-last)/1000);last=now;
   else if(S.screen==='select'){[0,1].forEach(function(i){var c=$('#selSp'+i).getContext('2d');c.clearRect(0,0,128,128);drawSprite(c,S.players[i].frames,0,0,128,'dance',t+i*.4,i===1);});
     document.querySelectorAll('[data-prev]').forEach(function(cv){drawPreview(cv.getContext('2d'),cv.dataset.prev,t);});
     }
-  else if(S.screen==='play'&&S.game){var G=S.game,pw=G.wait;if(!G.done)G.update(dt);
+  else if(S.screen==='play'&&S.game){var G=S.game,pw=G.wait;BOT.step(dt);if(!G.done)G.update(dt);
     if(pw>1&&G.wait<=1&&G.wait>0)SFX.ready();if(pw>0&&G.wait<=0&&!G.done)SFX.go();g.imageSmoothingEnabled=false;G.draw(g,t);
     if(G.done){if(!S.recorded){S.recorded=true;lbRecord(S.gameId,G.winner);S.endAt=now+1500;}
       txt(g,G.winner===-1?T('cDraw'):T('cWins',{name:S.players[G.winner].name}),400,300,34,'#ffe600');if(now>S.endAt)showResult();}}
