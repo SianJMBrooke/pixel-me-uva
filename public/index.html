@@ -343,7 +343,7 @@ var CARTOON=(function(){
 
   /* natural-looking palettes; detected colours snap to the closest one (by perceived colour), and players can change them */
   var SKIN_PAL=[[255,226,208],[248,210,186],[240,196,166],[232,182,148],[222,166,128],[206,148,108],[188,130,92],[162,110,76],[138,92,62],[112,74,50],[88,58,42],[66,44,34]];
-  var HAIR_PAL=[[26,22,26],[56,38,30],[92,62,42],[136,96,62],[124,56,34],[194,98,46],[176,138,86],[224,192,130],[238,228,204],[160,158,156],[226,226,222],[232,118,168],[70,108,206],[128,80,170]];
+  var HAIR_PAL=[[26,22,26],[56,38,30],[92,62,42],[136,96,62],[124,56,34],[194,98,46],[176,138,86],[224,192,130],[238,228,204],[150,148,146],[196,194,190],[232,232,228],[232,118,168],[70,108,206],[128,80,170]];
   function lab(c){var f=function(v){v/=255;return v>0.04045?Math.pow((v+0.055)/1.055,2.4):v/12.92},r=f(c[0]),g=f(c[1]),b=f(c[2]);
     var X=(r*0.4124+g*0.3576+b*0.1805)/0.95047,Y=r*0.2126+g*0.7152+b*0.0722,Z=(r*0.0193+g*0.1192+b*0.9505)/1.08883,h=function(t){return t>0.008856?Math.cbrt(t):7.787*t+16/116};
     return [116*h(Y)-16,500*(h(X)-h(Y)),200*(h(Y)-h(Z))];}
@@ -374,12 +374,15 @@ var CARTOON=(function(){
     var bg=[];for(i=0;i<N*N;i+=5)if(cls[i]===0){var jb=i*4;bg.push([d[jb],d[jb+1],d[jb+2]]);}
     var gain=[1,1,1];if(bg.length>200){var wref=med(upper(bg,0.15)),wl=lum(wref),spread=Math.max(wref[0],wref[1],wref[2])-Math.min(wref[0],wref[1],wref[2]);
       if(wl>90&&spread<60){var av=(wref[0]+wref[1]+wref[2])/3;gain=wref.map(function(v){return Math.max(0.86,Math.min(1.16,av/Math.max(1,v)))});}}
-    function wb(c3){return c3?[0,1,2].map(function(k){return Math.max(0,Math.min(255,Math.round(c3[k]*gain[k])))}):c3;}
+    /* exposure: phone/screen photos come out darker than people look, so lift until the image's bright end reaches near-white */
+    var ls=[];for(i=0;i<N*N;i+=7){var jl=i*4;ls.push(0.3*d[jl]+0.59*d[jl+1]+0.11*d[jl+2]);}ls.sort(function(a,b){return a-b});
+    var p95=ls[Math.floor(ls.length*0.95)]||240,expo=Math.max(1,Math.min(1.35,245/Math.max(1,p95)));
+    function wb(c3,extra){var e=expo*(extra||1);return c3?[0,1,2].map(function(k){return Math.max(0,Math.min(255,Math.round(c3[k]*gain[k]*e)))}):c3;}
     ys.sort(function(a,b){return a-b});var fy1=ys[Math.floor(ys.length*0.98)]||fy0+fw,fh=Math.max(8,fy1-fy0);
     function region(x0,x1,y0,y1,test){var out=[];for(var yy=Math.max(0,Math.round(y0));yy<=Math.min(N-1,Math.round(y1));yy++)for(var xx=Math.max(0,Math.round(x0));xx<=Math.min(N-1,Math.round(x1));xx++){var q2=yy*N+xx;if(!test||test(cls[q2])){var jj=q2*4;out.push([d[jj],d[jj+1],d[jj+2]]);}}return out;}
     var cheeks=region(fx0+fw*0.18,fx1-fw*0.18,fy0+fh*0.38,fy0+fh*0.72,function(k3){return k3===3});
-    var skinCol=cheeks.length>30?med(band(cheeks,0.35,0.85)):(sp.length?med(upper(sp,0.5)):[230,190,160]);skinCol=pop(wb(skinCol),1.04);
-    var hairCol=hp.length>120?wb(med(band(hp,0.25,0.75))):null;if(hairCol){var hs=Math.max.apply(null,hairCol)-Math.min.apply(null,hairCol);hairCol=hs<22?hairCol:pop(hairCol,1.1);}
+    var skinCol=cheeks.length>30?med(band(cheeks,0.5,0.86)):(sp.length?med(upper(sp,0.45)):[230,190,160]);skinCol=pop(wb(skinCol,1.03),1.03);
+    var hairCol=hp.length>120?wb(med(band(hp,0.45,0.85)),1.05):null;if(hairCol){var hs=Math.max.apply(null,hairCol)-Math.min.apply(null,hairCol);hairCol=hs<22?hairCol:pop(hairCol,1.1);}
     /* eyes: darkest pixels where the eyes sit; lips: the reddest pixels around the mouth */
     var eyeCol=null,eyes=region(fx0+fw*0.2,fx0+fw*0.45,fy0+fh*0.36,fy0+fh*0.52).concat(region(fx0+fw*0.55,fx0+fw*0.8,fy0+fh*0.36,fy0+fh*0.52));
     if(eyes.length>20){var dk=band(eyes,0,0.12),ec=wb(med(dk));if(lum(ec)<120)eyeCol=ec;}
@@ -387,7 +390,8 @@ var CARTOON=(function(){
     if(mouth.length>20&&beard<=60){var rd=function(p){return p[0]-(p[1]+p[2])/2};var mm=mouth.slice().sort(function(a,b){return rd(b)-rd(a)}).slice(0,Math.max(3,Math.floor(mouth.length*0.2))),lc=wb(med(mm));
       if(rd(lc)-rd(skinCol)>18)lipsCol=pop(lc,1.1);}
     var topW=top?wb(top):top,accW=accent?wb(accent):accent;
-    skinCol=nearest(SKIN_PAL,skinCol);hairCol=nearest(HAIR_PAL,hairCol);
+    skinCol=nearest(SKIN_PAL,skinCol);
+    if(hairCol){var hl=lab(hairCol);if(Math.hypot(hl[1],hl[2])<12&&hl[0]>45)hairCol=nearest([[150,148,146],[196,194,190],[232,232,228]],hairCol);else hairCol=nearest(HAIR_PAL,hairCol);}   /* grey/silver/white hair stays neutral */
     return {skin:skinCol,skinX:true,photo:true,eyeCol:eyeCol,lips:lipsCol,stubble:beard>35&&beard<=90&&!!hairCol,hair:hairCol,top:topW,accent:accW,
       glasses:gp.length>30,glassCol:gp.length?med(gp):[30,30,40],beard:beard>90&&!!hairCol,
       hat:hat>120,hatCol:ap.length?pop(med(ap),1.1):null,hairMask:hairCol?hair:null,accMask:hat>120?acc:null};}
