@@ -1327,8 +1327,8 @@ function loop(now){var t=now/1000,dt=Math.min(0.05,(now-last)/1000);last=now;
   else if(S.screen==='result'){drawResult(t);}
   introTick(now,t);idleTick(now);
   requestAnimationFrame(loop);}
-/* Idle reset: after 20 s without a tap, go back to the start screen (not during a game). A notice counts down the last 10 s. */
-var IDLE_MS=20000,IDLE_WARN=10000;
+/* Idle reset: after 5 minutes without a tap the notice appears and counts down 20 s, then it goes back to the start screen (not during a game). */
+var IDLE_WARN=20000,IDLE_MS=5*60*1000+IDLE_WARN;
 function idleActive(){if(S.screen==='play'&&!INTRO.id)return false;
   if(S.screen==='lobby')return S.players.some(function(p){return p.state!=='waiting'&&!(p.state==='camera'&&p.count)});
   return true;}
